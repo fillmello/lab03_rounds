@@ -1,0 +1,28 @@
+@startuml sequencia-enviar-moedas
+title Sequencia - Enviar moedas a um aluno
+skinparam shadowing false
+autonumber
+
+actor Professor
+participant "View" as V
+participant "MoedaController" as C
+participant "MoedaService" as S
+participant "Repository" as R
+participant "Notificador" as N
+
+Professor -> V : informa aluno, quantidade e motivo
+V -> C : POST /moedas/enviar
+C -> S : enviarMoedas(profId, alunoId, qtd, motivo)
+S -> R : buscarProfessor / buscarAluno
+R --> S : entidades
+alt motivo vazio ou saldo insuficiente
+  S --> C : erro de validacao
+  C --> V : exibe mensagem
+else valido
+  S -> S : professor.saldo -= qtd\naluno.saldo += qtd
+  S -> R : salvar(EnvioMoeda, professor, aluno)
+  S -> N : enviarEmail(aluno, professor, qtd, motivo)
+  S --> C : sucesso
+  C --> V : confirmacao
+end
+@enduml

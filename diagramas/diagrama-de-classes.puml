@@ -1,0 +1,100 @@
+@startuml diagrama-de-classes
+title Sistema de Moeda Estudantil - Diagrama de Classes
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+abstract class Usuario {
+  -id: Long
+  -nome: String
+  -email: String
+  -login: String
+  -senhaHash: String
+  +autenticar(senhaDigitada: String): boolean
+}
+
+class Aluno {
+  -cpf: String
+  -rg: String
+  -endereco: String
+  -curso: String
+  -saldo: int
+  +consultarExtrato(): List<Transacao>
+  +trocarVantagem(v: Vantagem): TrocaVantagem
+  +receberMoedas(qtd: int): void
+}
+
+class Professor {
+  -cpf: String
+  -departamento: String
+  -saldo: int
+  +enviarMoedas(a: Aluno, qtd: int, motivo: String): EnvioMoeda
+  +consultarExtrato(): List<Transacao>
+  +creditarSemestre(): void
+}
+
+class EmpresaParceira {
+  -cnpj: String
+  +cadastrarVantagem(v: Vantagem): void
+  +conferirTroca(codigo: String): boolean
+}
+
+class InstituicaoEnsino {
+  -id: Long
+  -nome: String
+}
+
+class Vantagem {
+  -id: Long
+  -descricao: String
+  -foto: String
+  -custoEmMoedas: int
+}
+
+abstract class Transacao {
+  -id: Long
+  -data: LocalDateTime
+  -quantidade: int
+}
+
+class EnvioMoeda {
+  -motivo: String
+}
+
+class TrocaVantagem {
+  -codigo: String
+  +gerarCodigo(): String
+}
+
+interface Notificador {
+  +enviarEmail(destino: String, assunto: String, corpo: String): void
+}
+
+Usuario <|-- Aluno
+Usuario <|-- Professor
+Usuario <|-- EmpresaParceira
+
+Transacao <|-- EnvioMoeda
+Transacao <|-- TrocaVantagem
+
+InstituicaoEnsino "1" o-- "0..*" Aluno : estuda em
+InstituicaoEnsino "1" o-- "0..*" Professor : leciona em
+
+Professor "1" -- "0..*" EnvioMoeda : envia
+Aluno "1" -- "0..*" EnvioMoeda : recebe
+Aluno "1" -- "0..*" TrocaVantagem : realiza
+TrocaVantagem "0..*" -- "1" Vantagem : resgata
+EmpresaParceira "1" *-- "0..*" Vantagem : oferece
+
+note right of Transacao
+  Extrato = lista de Transacoes.
+  Professor: EnvioMoeda enviados.
+  Aluno: EnvioMoeda recebidos +
+  TrocaVantagem realizadas.
+end note
+
+note bottom of Professor
+  creditarSemestre(): saldo = saldo + 1000
+end note
+
+@enduml

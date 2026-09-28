@@ -1,0 +1,32 @@
+@startuml sequencia-trocar-vantagem
+title Sequencia - Trocar moedas por vantagem
+skinparam shadowing false
+autonumber
+
+actor Aluno
+participant "View" as V
+participant "VantagemController" as C
+participant "TrocaService" as S
+participant "Repository" as R
+participant "Notificador" as N
+actor "Empresa Parceira" as E
+
+Aluno -> V : seleciona vantagem
+V -> C : POST /vantagens/{id}/trocar
+C -> S : trocar(alunoId, vantagemId)
+S -> R : buscarAluno / buscarVantagem
+R --> S : entidades
+alt saldo insuficiente
+  S --> C : erro
+  C --> V : exibe mensagem
+else saldo suficiente
+  S -> S : aluno.saldo -= custo\ncodigo = gerarCodigo()
+  S -> R : salvar(TrocaVantagem)
+  S -> N : enviarCupom(aluno, codigo)
+  S -> N : enviarConferencia(empresa, codigo)
+  N --> Aluno : e-mail com cupom (codigo)
+  N --> E : e-mail de conferencia (mesmo codigo)
+  S --> C : sucesso
+  C --> V : exibe codigo do cupom
+end
+@enduml

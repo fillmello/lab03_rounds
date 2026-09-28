@@ -1,0 +1,52 @@
+@startuml casos-de-uso
+title Sistema de Moeda Estudantil - Diagrama de Casos de Uso
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor Aluno
+actor Professor
+actor "Empresa Parceira" as Empresa
+actor "Agendador\n(semestral)" as Agendador
+actor "Servidor de\nE-mail" as Email <<sistema externo>>
+
+rectangle "Sistema de Moeda Estudantil" {
+  usecase "Realizar login" as UC01
+  usecase "Cadastrar-se\n(aluno ou empresa)" as UC02
+  usecase "Enviar moedas a um aluno" as UC03
+  usecase "Consultar extrato" as UC04
+  usecase "Trocar moedas por vantagem" as UC05
+  usecase "Cadastrar vantagem" as UC06
+  usecase "Conferir troca de vantagem" as UC07
+  usecase "Creditar moedas semestrais" as UC08
+  usecase "Enviar e-mail de notificacao" as UC09
+}
+
+Aluno --> UC01
+Aluno --> UC02
+Aluno --> UC04
+Aluno --> UC05
+
+Professor --> UC01
+Professor --> UC03
+Professor --> UC04
+
+Empresa --> UC01
+Empresa --> UC02
+Empresa --> UC06
+Empresa --> UC07
+
+Agendador --> UC08
+UC09 --> Email
+
+UC03 ..> UC01 : <<include>>
+UC04 ..> UC01 : <<include>>
+UC05 ..> UC01 : <<include>>
+UC06 ..> UC01 : <<include>>
+UC07 ..> UC01 : <<include>>
+UC03 ..> UC09 : <<include>>
+UC05 ..> UC09 : <<include>>
+
+
+
+@enduml
