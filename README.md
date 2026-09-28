@@ -5,8 +5,7 @@
 # 🪙 Sistema de Moeda Estudantil 👨‍💻
 
 > [!NOTE]
-> Plataforma que estimula o **reconhecimento do mérito estudantil** por meio de uma **moeda virtual**: professores distribuem moedas aos alunos e os alunos as trocam por **vantagens em empresas parceiras**.
-> 🖼️ _Crie uma logo para o projeto e substitua a imagem ao lado._
+> Plataforma que estimula o **reconhecimento do mérito estudantil** por meio de uma **moeda virtual**: professores distribuem moedas aos alunos e os alunos as trocam por **vantagens em empresas parceiras**.  
 
 <table>
   <tr>
@@ -29,21 +28,28 @@
 
 🟡 **Em desenvolvimento** — Sprint atual: **Lab03S01 (Modelagem)**
 
+### Badges básicos:
+
 [![Versão](https://img.shields.io/badge/Versão-v0.1.0-blue)](https://github.com/SEU-USUARIO/sistema-moeda-estudantil/releases)
 [![Sprint](https://img.shields.io/badge/Sprint-Lab03S01-orange)](docs/sprints/lab03s01.md)
 [![Modelagem](https://img.shields.io/badge/Modelagem-PlantUML-green)](docs/diagramas)
 [![Arquitetura](https://img.shields.io/badge/Arquitetura-MVC-blueviolet)](#-arquitetura)
 [![Licença](https://img.shields.io/github/license/SEU-USUARIO/sistema-moeda-estudantil)](#-licença)
 
-![GitHub last commit](https://img.shields.io/github/last-commit/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=clockify) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&color=007ec6&logo=gitkraken) ![GitHub repo size](https://img.shields.io/github/repo-size/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=files)
+### Outros badges:
 
-> 🔁 Substitua `SEU-USUARIO` pelo usuário/organização do GitHub do grupo.
+![GitHub last commit](https://img.shields.io/github/last-commit/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=clockify) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&color=007ec6&logo=gitkraken) ![GitHub repo size](https://img.shields.io/github/repo-size/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=files) ![GitHub stars](https://img.shields.io/github/stars/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=git) ![GitHub license](https://img.shields.io/github/license/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&color=007ec6&logo=opensourceinitiative)
+
+> 🔁 Substitua `SEU-USUARIO` pelo usuário/organização do GitHub do grupo. Adicione badges das tecnologias (ex.: Java, React, PostgreSQL) quando a stack for definida.
 
 ---
 
 ## 📚 Índice
 - [Links Úteis](#-links-úteis)
 - [Sobre o Projeto](#-sobre-o-projeto)
+  - [Perfis de usuário](#perfis-de-usuário)
+  - [Regras-chave](#regras-chave)
+  - [Roadmap de Sprints](#-roadmap-de-sprints)
 - [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura](#-arquitetura)
@@ -52,15 +58,24 @@
 - [Instalação e Execução](#-instalação-e-execução)
   - [Pré-requisitos](#pré-requisitos)
   - [Variáveis de Ambiente](#-variáveis-de-ambiente)
+     - [1 Back-end](#1-back-end)
+     - [2 Front-end](#2-front-end)
+     - [3 Exemplos de Variáveis de Ambiente em Provedores de Deploy](#3-exemplos-de-variáveis-de-ambiente-em-provedores-de-deploy)
   - [Instalação de Dependências](#-instalação-de-dependências)
+    - [Front-end](#front-end)
+    - [Back-end](#back-end)
   - [Inicialização do Banco de Dados](#-inicialização-do-banco-de-dados)
   - [Como Executar a Aplicação](#-como-executar-a-aplicação)
-  - [Execução Local Completa com Docker Compose](#-execução-local-completa-com-docker-compose-incluindo-banco-de-dados)
+    - [Terminal 1: Back-end](#terminal-1-back-end)
+    - [Terminal 2: Front-end](#terminal-2-front-end)
+    - [Execução Local Completa com Docker Compose (Incluindo Banco de Dados)](#-execução-local-completa-com-docker-compose-incluindo-banco-de-dados)
+    - [Passos para build, inicialização e execução](#-passos-para-build-inicialização-e-execução)
 - [Deploy](#-deploy)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Demonstração](#-demonstração)
+  - [Aplicativo Mobile](#-aplicativo-mobile)
   - [Aplicação Web](#-aplicação-web)
-  - [Exemplo de saída no Terminal](#-exemplo-de-saída-no-terminal-para-back-end-api-cli)
+  - [Exemplo de saída no Terminal (para Back-end, API, CLI)](#-exemplo-de-saída-no-terminal-para-back-end-api-cli)
 - [Testes](#-testes)
 - [Documentações utilizadas](#-documentações-utilizadas)
 - [Autores](#-autores)
@@ -75,7 +90,9 @@
 * 📦 **Repositório:** [github.com/SEU-USUARIO/sistema-moeda-estudantil](https://github.com/SEU-USUARIO/sistema-moeda-estudantil)
   > 💻 **Descrição:** Repositório oficial do grupo, com todas as versões dos modelos UML e do código.
 * 🌐 **Demo Online:** _[link-da-demo-web]_ (a definir, se houver deploy)
-  > 💻 **Descrição:** Link para a aplicação em ambiente de produção.
+  > 💻 **Descrição:** Link para a aplicação em ambiente de produção (Ex: hospedado na Vercel, Netlify ou AWS S3).
+* 📱 **Download Mobile:** _Não se aplica na Release 1 (aplicação web)._
+  > 📱 **Descrição:** Se o grupo criar um app, inclua aqui os links da App Store, Google Play ou APK direto.
 * 📖 **Documentação:** [`docs/`](docs/)
   > 📚 **Descrição:** [Requisitos e regras de negócio](docs/requisitos.md) · [Histórias do Usuário](docs/historias-de-usuario.md) · [Diagramas UML](docs/diagramas/) · [Guia da Sprint Lab03S01](docs/sprints/lab03s01.md)
 
@@ -87,7 +104,7 @@
 
 **Qual problema resolve:** professores não dispõem de uma forma estruturada e rastreável de reconhecer bom comportamento e participação; alunos não têm retorno concreto por esse esforço. A moeda virtual cria esse elo, e as empresas parceiras ganham visibilidade ao oferecer vantagens.
 
-**Contexto:** projeto acadêmico da disciplina de **Laboratório de Desenvolvimento de Software** (Lab03, Release 1), desenvolvido em três sprints.
+**Qual o contexto:** projeto acadêmico da disciplina de **Laboratório de Desenvolvimento de Software** (Lab03, Release 1), desenvolvido em três sprints.
 
 **Onde pode ser utilizado:** instituições de ensino participantes (pré-cadastradas), com professores, alunos e empresas parceiras interagindo pela plataforma.
 
@@ -106,6 +123,7 @@
 - Na troca, o custo é **descontado do saldo** e um **e-mail com o mesmo código** é enviado ao aluno (cupom) e à empresa (conferência).
 - Todos os perfis exigem **login e senha** (autenticação obrigatória).
 
+> [!NOTE]
 > Regras completas: [`docs/requisitos.md`](docs/requisitos.md)
 
 ### 📅 Roadmap de Sprints
@@ -133,13 +151,14 @@
 
 ## 🛠 Tecnologias Utilizadas
 
-> 🚧 _Stack a ser definida pelo grupo. Preencha conforme as decisões tomadas (a escolha também será apresentada no tutorial da Sprint 03)._
+> 🚧 _Stack a ser definida pelo grupo. Preencha conforme as decisões tomadas (a escolha também será apresentada no tutorial da Sprint 03). Recomenda-se listar as versões utilizadas para garantir a compatibilidade._
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** _[Ex: React, Thymeleaf, Angular]_
+* **Framework/Biblioteca:** _[Ex: React v18, Thymeleaf, Angular v17]_
 * **Linguagem/Superset:** _[Ex: TypeScript, JavaScript ES6+]_
 * **Estilização:** _[Ex: Tailwind CSS, Bootstrap, Material UI]_
+* **Gerenciamento de Estado:** _[Ex: Redux Toolkit, Zustand, Context API]_
 * **Build Tool:** _[Ex: Vite, Webpack]_
 
 ### 🖥️ Back-end
@@ -151,6 +170,11 @@
 * **Autenticação:** _[Ex: JWT, Spring Security]_
 * **E-mail:** _[Ex: JavaMail, Nodemailer, SendGrid]_
 
+### 📱 Mobile (Opcional)
+
+* **Framework:** _[Ex: React Native, Flutter — não previsto na Release 1]_
+* **Ferramentas:** _[Ex: Expo, Android Studio, Xcode]_
+
 ### 🧩 Modelagem e Documentação
 
 * **UML:** [PlantUML](https://plantuml.com/) (casos de uso, classes, componentes e sequência)
@@ -159,13 +183,15 @@
 ### ⚙️ Infraestrutura & DevOps (opcional)
 
 * **Containerização:** _[Ex: Docker, Docker Compose]_
-* **CI/CD:** _[Ex: GitHub Actions]_
+* **Orquestração:** _[Ex: Kubernetes (K8s)]_
+* **Cloud:** _[Ex: AWS, Vercel, Heroku, Google Cloud]_
+* **CI/CD:** _[Ex: GitHub Actions, Jenkins, SonarQube]_
 
 ---
 
 ## 🏗 Arquitetura
 
-O sistema segue o padrão **MVC (Model-View-Controller)**, com uma camada de **Service** para regras de negócio e uma camada de **Repository** (DAO/ORM, definida na Sprint 02) para persistência.
+O sistema segue o padrão **MVC (Model-View-Controller)**, com uma camada de **Service** para regras de negócio e uma camada de **Repository** (DAO/ORM, definida na Sprint 02) para persistência. Essa separação isola as regras de saldo, cupom e notificação das telas e do acesso a dados, facilitando testes e manutenção.
 
 - **Model:** entidades de domínio (`Usuario`, `Aluno`, `Professor`, `EmpresaParceira`, `InstituicaoEnsino`, `Vantagem`, `Transacao`, `EnvioMoeda`, `TrocaVantagem`).
 - **View:** telas de login, cadastro, envio de moedas, extrato, catálogo de vantagens e troca.
@@ -173,7 +199,7 @@ O sistema segue o padrão **MVC (Model-View-Controller)**, com uma camada de **S
 - **Service:** regras de saldo, crédito semestral, geração do código do cupom e notificações.
 - **Repository:** acesso ao banco de dados.
 
-**Decisões de modelagem importantes**
+**Decisões arquiteturais importantes**
 - `Transacao` é **abstrata**, com as especializações `EnvioMoeda` (professor → aluno, com motivo) e `TrocaVantagem` (aluno → vantagem, com código), pois têm participantes e regras diferentes.
 - `EmpresaParceira` **herda de `Usuario`** para reaproveitar a autenticação.
 - O **extrato** é a lista de `Transacao` do usuário.
@@ -215,16 +241,20 @@ Histórias do Usuário: [`docs/historias-de-usuario.md`](docs/historias-de-usuar
 > 🚧 _Seção a ser preenchida a partir da Sprint 02, quando houver código executável. Abaixo, o esqueleto do template para adaptar à stack escolhida._
 
 ### Pré-requisitos
-* **[Linguagem/Runtime]:** _versão_
-* **Gerenciador de Pacotes / Build:** _[npm, Maven, Gradle, pip...]_
+Certifique-se de que o usuário tenha o ambiente configurado.
+
+* **[Linguagem/Runtime]:** _versão_ (Ex: Java JDK 17+ ou Node.js LTS)
+* **Gerenciador de Pacotes / Build:** _[npm, yarn, Maven, Gradle, pip...]_
 * **Banco de Dados:** _[PostgreSQL, MySQL...]_
-* **Docker** (opcional, recomendado para o banco de dados)
+* **Docker** (Opcional, mas **altamente recomendado** para rodar o Banco de Dados)
 
 ---
 
 ### 🔑 Variáveis de Ambiente
 
-Crie um arquivo `.env` (ou configure no sistema) com as variáveis abaixo. **Nunca versione segredos**; mantenha um `.env.example` sem valores sensíveis.
+Crie arquivos `.env` específicos e/ou configure as variáveis de ambiente no seu sistema para cada parte da aplicação. **Nunca versione segredos**; mantenha um `.env.example` sem valores sensíveis.
+
+#### 1 Back-end
 
 | Variável | Descrição | Exemplo |
 | :--- | :--- | :--- |
@@ -237,11 +267,42 @@ Crie um arquivo `.env` (ou configure no sistema) com as variáveis abaixo. **Nun
 | `MAIL_PORT` | Porta SMTP. | `587` |
 | `MAIL_USER` | Usuário/conta de e-mail remetente. | `noreply@exemplo.com` |
 | `MAIL_PASSWORD` | Senha/app password do e-mail. | `sua_senha_aqui` |
-| `API_URL` (front-end) | URL base da API consumida pelo front-end. | `http://localhost:8080/api` |
+
+#### 2 Front-end
+
+Crie um arquivo **`.env`** na raiz da pasta do front-end. Em projetos **Vite**, use o prefixo `VITE_` (ou `REACT_APP_` se estiver usando CRA) para expor as variáveis ao *bundle* da aplicação.
+
+| Variável | Descrição | Exemplo |
+| :--- | :--- | :--- |
+| `API_URL` (ou `VITE_API_URL`) | URL base da API consumida pelo front-end. | `http://localhost:8080/api` |
+
+---
+
+#### 3 Exemplos de Variáveis de Ambiente em Provedores de Deploy
+
+> _Opcional. Preencha se o grupo fizer deploy (ex.: Vercel, Railway, Render)._
+
+Nos provedores, as variáveis são configuradas no painel do projeto (ex.: Vercel: Project Settings > Environment Variables).
+
+```
+# Back-end
+DB_URL=jdbc:postgresql://<host>:5432/moeda_estudantil
+DB_USER=<usuario>
+DB_PASSWORD=<senha>
+MAIL_HOST=smtp.exemplo.com
+MAIL_PORT=587
+MAIL_USER=<email-remetente>
+MAIL_PASSWORD=<senha-ou-app-password>
+
+# Front-end
+VITE_API_URL=https://<url-do-backend>/api
+```
 
 ---
 
 ### 📦 Instalação de Dependências
+
+Clone o repositório e instale as dependências.
 
 1. **Clone o repositório:**
 
@@ -252,12 +313,26 @@ cd sistema-moeda-estudantil
 
 2. **Instale as dependências** _(ajuste à stack escolhida)_:
 
-```bash
-# Exemplo Node.js
-npm install
+#### Front-end
 
+```bash
+cd frontend
+npm install
+# ou
+yarn install
+cd ..
+```
+
+#### Back-end
+
+```bash
 # Exemplo Maven
+cd backend
 ./mvnw clean install
+cd ..
+
+# Exemplo Node.js
+# cd backend && npm install
 ```
 
 ---
@@ -266,23 +341,39 @@ npm install
 
 _Exemplo com PostgreSQL via Docker:_
 
+1. **Rode o Container do banco de dados:**
+
 ```bash
 docker run --name moeda_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=senha-segura-123 -e POSTGRES_DB=moeda_estudantil -p 5432:5432 -d postgres:16
 ```
 
-**Migrações:** _[descrever se o schema é gerado pelo ORM (ex.: Hibernate ddl-auto) ou por Flyway/Liquibase/scripts SQL]_
+2. **Execute as Migrações:**  
+   _[descrever se o schema é gerado pelo ORM (ex.: Hibernate `ddl-auto`) ou por Flyway/Liquibase/scripts SQL]_
 
-**Carga inicial:** as **instituições** e os **professores** são pré-cadastrados; descreva aqui o script/seed que popula esses dados.
+3. **Carga inicial:** as **instituições** e os **professores** são pré-cadastrados; descreva aqui o script/seed que popula esses dados.
 
 ---
 
 ### ⚡ Como Executar a Aplicação
+Execute a aplicação em modo de desenvolvimento em **dois terminais separados** (caso back-end e front-end sejam projetos distintos).
+
+#### Terminal 1: Back-end
 
 ```bash
 # _[comando de execução do back-end]_
-# _[comando de execução do front-end, se separado]_
+# Ex.: cd backend && ./mvnw spring-boot:run
 ```
-🚀 *A aplicação estará disponível em **http://localhost:8080** (ajuste conforme a stack).*
+🚀 *O Back-end estará disponível em **http://localhost:8080** (ajuste conforme a stack).*
+
+---
+
+#### Terminal 2: Front-end
+
+```bash
+# _[comando de execução do front-end, se separado]_
+# Ex.: cd frontend && npm run dev
+```
+🎨 *O Front-end estará disponível em **http://localhost:5173** (ou a porta configurada).*
 
 ---
 
@@ -290,9 +381,48 @@ docker run --name moeda_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=senha-
 
 > _Opcional. Preencha se o grupo adotar Docker Compose._
 
+Antes de tudo, certifique-se de que o **Docker Desktop** (Mac/Windows) ou o **serviço Docker** (Linux) está em execução.
+
+```bash
+sudo systemctl start docker   # Linux
+```
+
+---
+
+#### 📦 Passos para build, inicialização e execução
+
+1. Acesse a pasta raiz do projeto (onde está o `docker-compose.yml`):
+
+```bash
+cd /caminho/do/projeto/sistema-moeda-estudantil
+```
+
+2. Suba todos os serviços definidos no `docker-compose.yml`:
+
 ```bash
 docker-compose up --build -d
+```
+
+> [!NOTE]
+> 💡 O parâmetro `--build` garante que as imagens mais recentes do projeto sejam geradas, e `-d` executa em segundo plano.
+
+3. Verifique se os containers estão rodando:
+
+```bash
 docker ps
+```
+
+4. **Migrações do banco:** confirme nos logs do back-end que o schema foi criado.
+
+```bash
+docker logs <nome_do_container_backend>
+```
+
+5. Abra no navegador a porta configurada no `docker-compose` (Ex.: <http://localhost:3000> ou <http://localhost:5173>).
+
+6. Para parar e remover os containers e redes:
+
+```bash
 docker-compose down
 ```
 
@@ -302,11 +432,23 @@ docker-compose down
 
 _[Descrever build de produção, variáveis do ambiente e comando de execução, caso o grupo faça deploy.]_
 
+1. **Build do Projeto:**
+
 ```bash
 # Exemplo genérico
-# 1. build do projeto
-# 2. configurar variáveis de ambiente no provedor
-# 3. executar o artefato gerado
+# 1. build do front-end (ex.: npm run build)
+# 2. build do back-end (ex.: ./mvnw clean package)
+```
+
+2. **Configuração do Ambiente de Produção:** defina as variáveis de ambiente no provedor escolhido (e.g., Vercel, Railway, Heroku, DigitalOcean).
+
+> 🔑 **Variáveis Cruciais:** configure a conexão com o banco de dados (`DB_URL`, `DB_USER`, `DB_PASSWORD`), o servidor de e-mail (`MAIL_*`) e a URL da API de produção para o front-end.
+
+3. **Execução em Produção:**
+
+```bash
+# Exemplo genérico: executar o artefato gerado
+# java -jar backend/target/nome-do-projeto.jar
 ```
 
 ---
@@ -348,10 +490,18 @@ _[Descrever build de produção, variáveis do ambiente e comando de execução,
 
 ## 🎥 Demonstração
 
+Use GIFs e prints para mostrar o projeto em ação.
+
 > [!WARNING]
-> Dê preferência a hospedar suas imagens em um **CDN** ou no **GitHub Pages** para que carreguem rapidamente e não quebrem.
+> Dê preferência a hospedar suas imagens em um **CDN** (Content Delivery Network) ou no **GitHub Pages** para garantir que elas carreguem rapidamente e não quebrem. Saiba mais sobre o GitHub Pages clicando [aqui](https://github.com/joaopauloaramuni/joaopauloaramuni.github.io).
+
+### 📱 Aplicativo Mobile
+
+_Não se aplica na Release 1 (aplicação web). Se o grupo desenvolver uma versão mobile, adicione aqui GIFs e capturas de tela._
 
 ### 🌐 Aplicação Web
+
+Para melhor visualização, as telas principais estão organizadas lado a lado.
 
 | Tela | Captura de Tela |
 | :---: | :---: |
@@ -368,7 +518,10 @@ _[Descrever build de produção, variáveis do ambiente e comando de execução,
 
 > _Exemplo ilustrativo. Ajuste rotas e campos à API real do grupo._
 
+#### 1. Demonstração da API (Exemplo com cURL)
+
 ```bash
+# Professor envia 50 moedas a um aluno
 curl -X POST 'http://localhost:8080/api/moedas/enviar' \
      -H 'Authorization: Bearer <jwt-do-professor>' \
      -H 'Content-Type: application/json' \
@@ -395,12 +548,22 @@ curl -X POST 'http://localhost:8080/api/moedas/enviar' \
 > 🚧 _A preencher a partir da Sprint 02._
 
 ### Testes Unitários e de Integração
+Para rodar os testes da unidade e integração:
+
 ```
 # _[comando de testes da stack escolhida]_
 ```
-*Ferramenta utilizada: _[JUnit, Jest, PyTest, ...]_*
+*Ferramenta utilizada: _[JUnit, Jest, Vitest, PyTest, ...]_*
 
 **Cenários prioritários:** envio com saldo insuficiente, envio sem motivo, crédito semestral acumulando saldo, troca com saldo insuficiente, geração de código único de cupom, autenticação inválida.
+
+### Testes End-to-End (E2E)
+Para rodar os testes de ponta a ponta (E2E):
+
+```
+# _[comando dos testes E2E, se houver]_
+```
+*Ferramenta utilizada: _[Cypress, Playwright, Selenium, ...]_*
 
 ---
 
@@ -408,7 +571,7 @@ curl -X POST 'http://localhost:8080/api/moedas/enviar' \
 
 * 📖 **PlantUML:** [Documentação Oficial](https://plantuml.com/)
 * 📖 **UML:** [Guia de Diagramas UML](https://www.uml-diagrams.org/)
-* 📖 **Guia de Estilo:** [**Conventional Commits**](https://www.conventionalcommits.org/en/v1.0.0/)
+* 📖 **Guia de Estilo:** [**Conventional Commits** (Padrão de Mensagens)](https://www.conventionalcommits.org/en/v1.0.0/)
 * 📖 **Documentação Interna:** [Requisitos](docs/requisitos.md) · [Histórias do Usuário](docs/historias-de-usuario.md)
 * 📖 _[Framework/ORM/banco escolhidos pelo grupo]_
 
@@ -430,6 +593,7 @@ curl -X POST 'http://localhost:8080/api/moedas/enviar' \
 ---
 
 ## 🤝 Contribuição
+Guia para contribuições ao projeto.
 
 1. Faça um `fork` do projeto.
 2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`).
@@ -438,11 +602,14 @@ curl -X POST 'http://localhost:8080/api/moedas/enviar' \
 5. Abra um **Pull Request (PR)**.
 
 > [!IMPORTANT]
-> 📝 **Regras:** commits pequenos e frequentes, com mensagens claras (ex.: `docs: adiciona diagrama de casos de uso`). Sempre que um modelo UML for alterado, versione o `.puml` **e** a imagem gerada.
+> 📝 **Regras:** commits pequenos e frequentes, com mensagens claras (ex.: `docs: adiciona diagrama de casos de uso`). Sempre que um modelo UML for alterado, versione o `.puml` **e** a imagem gerada. Veja também o arquivo [`CONTRIBUTING.md`](./CONTRIBUTING.md), se existir.
 
 ---
 
 ## 🙏 Agradecimentos
+Em ambiente acadêmico, citar fontes e inspirações é crucial (integridade acadêmica).
+
+Gostaria de agradecer aos seguintes canais e pessoas que foram fundamentais para o desenvolvimento deste projeto:
 
 * [**Engenharia de Software PUC Minas**](https://www.instagram.com/engsoftwarepucminas/) - Pelo apoio institucional, estrutura acadêmica e fomento à inovação e boas práticas de engenharia.
 * [**Prof. Dr. João Paulo Aramuni**](https://github.com/joaopauloaramuni) - Pelos valiosos ensinamentos sobre **Arquitetura de Software** e **Padrões de Projeto**.
