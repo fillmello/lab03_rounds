@@ -10,7 +10,7 @@ abstract class Usuario {
   -email: String
   -login: String
   -senhaHash: String
-  +autenticar(senhaDigitada: String): boolean
+  +realizarLogin(senhaDigitada: String): boolean
 }
 
 class Aluno {

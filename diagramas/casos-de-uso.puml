@@ -4,6 +4,7 @@ left to right direction
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+actor Usuario <<abstract>>
 actor Aluno
 actor Professor
 actor "Empresa Parceira" as Empresa
@@ -22,28 +23,25 @@ rectangle "Sistema de Moeda Estudantil" {
   usecase "Enviar e-mail de notificacao" as UC09
 }
 
-Aluno --> UC01
 Aluno --> UC02
 Aluno --> UC04
 Aluno --> UC05
 
-Professor --> UC01
 Professor --> UC03
 Professor --> UC04
 
-Empresa --> UC01
 Empresa --> UC02
 Empresa --> UC06
 Empresa --> UC07
 
+Usuario --> UC01
+Usuario <|-- Aluno
+Usuario <|-- Professor
+Usuario <|-- Empresa
+
 Agendador --> UC08
 UC09 --> Email
 
-UC03 ..> UC01 : <<include>>
-UC04 ..> UC01 : <<include>>
-UC05 ..> UC01 : <<include>>
-UC06 ..> UC01 : <<include>>
-UC07 ..> UC01 : <<include>>
 UC03 ..> UC09 : <<include>>
 UC05 ..> UC09 : <<include>>
 
