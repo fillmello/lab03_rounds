@@ -1,4 +1,4 @@
-<!-- README baseado no template do Prof. Dr. João Paulo Aramuni (Lab. de Desenvolvimento de Software). Campos em _itálico_ ou entre [colchetes] devem ser preenchidos/adaptados pelo grupo. -->
+<!-- README baseado no template do Prof. Dr. João Paulo Aramuni (Lab. de Desenvolvimento de Software). -->
 
 ---
 
@@ -26,21 +26,15 @@
 
 ## 🚧 Status do Projeto
 
-🟡 **Em desenvolvimento** — Sprint atual: **Lab03S01 (Modelagem)**
+🟢 **Sprint 01 concluída** — Modelagem da Release 1 entregue.
 
-### Badges básicos:
-
-[![Versão](https://img.shields.io/badge/Versão-v0.1.0-blue)](https://github.com/SEU-USUARIO/sistema-moeda-estudantil/releases)
+[![Versão](https://img.shields.io/badge/Versão-v0.1.0-blue)](https://github.com/fillmello/lab03_rounds/releases)
 [![Sprint](https://img.shields.io/badge/Sprint-Lab03S01-orange)](docs/sprints/lab03s01.md)
 [![Modelagem](https://img.shields.io/badge/Modelagem-PlantUML-green)](docs/diagramas)
 [![Arquitetura](https://img.shields.io/badge/Arquitetura-MVC-blueviolet)](#-arquitetura)
-[![Licença](https://img.shields.io/github/license/SEU-USUARIO/sistema-moeda-estudantil)](#-licença)
+[![Licença](https://img.shields.io/github/license/fillmello/lab03_rounds)](#-licença)
 
-### Outros badges:
-
-![GitHub last commit](https://img.shields.io/github/last-commit/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=clockify) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&color=007ec6&logo=gitkraken) ![GitHub repo size](https://img.shields.io/github/repo-size/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=files) ![GitHub stars](https://img.shields.io/github/stars/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&logo=git) ![GitHub license](https://img.shields.io/github/license/SEU-USUARIO/sistema-moeda-estudantil?style=for-the-badge&color=007ec6&logo=opensourceinitiative)
-
-> 🔁 Substitua `SEU-USUARIO` pelo usuário/organização do GitHub do grupo. Adicione badges das tecnologias (ex.: Java, React, PostgreSQL) quando a stack for definida.
+![GitHub last commit](https://img.shields.io/github/last-commit/fillmello/lab03_rounds?style=for-the-badge&logo=clockify) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/fillmello/lab03_rounds?style=for-the-badge&color=007ec6&logo=gitkraken) ![GitHub repo size](https://img.shields.io/github/repo-size/fillmello/lab03_rounds?style=for-the-badge&logo=files) ![GitHub stars](https://img.shields.io/github/stars/fillmello/lab03_rounds?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/fillmello/lab03_rounds?style=for-the-badge&logo=git) ![GitHub license](https://img.shields.io/github/license/fillmello/lab03_rounds?style=for-the-badge&color=007ec6&logo=opensourceinitiative)
 
 ---
 
@@ -87,7 +81,7 @@
 ---
 
 ## 🔗 Links Úteis
-* 📦 **Repositório:** [github.com/SEU-USUARIO/sistema-moeda-estudantil](https://github.com/SEU-USUARIO/sistema-moeda-estudantil)
+* 📦 **Repositório:** [github.com/fillmello/lab03_rounds](https://github.com/fillmello/lab03_rounds)
   > 💻 **Descrição:** Repositório oficial do grupo, com todas as versões dos modelos UML e do código.
 * 🌐 **Demo Online:** _[link-da-demo-web]_ (a definir, se houver deploy)
   > 💻 **Descrição:** Link para a aplicação em ambiente de produção (Ex: hospedado na Vercel, Netlify ou AWS S3).
@@ -232,7 +226,7 @@ Histórias do Usuário: [`docs/historias-de-usuario.md`](docs/historias-de-usuar
 | Módulo de Vantagens | Cadastro de vantagens, troca e geração de cupom | controller + service + model (`Vantagem`, `TrocaVantagem`) |
 | Módulo de Notificação | Envio de e-mails (moeda recebida e cupom) | service (integração SMTP) |
 
-**Trade-offs / limitações:** _[preencher: ex. saldo armazenado na entidade vs. derivado das transações; e-mails síncronos vs. assíncronos]_
+**Trade-offs / limitações:** nesta primeira modelagem, o saldo é mantido na entidade para permitir consulta direta; cada operação também gera uma transação para auditoria. O envio de e-mails foi representado como uma dependência de notificação, deixando a escolha entre processamento síncrono ou assíncrono para a implementação.
 
 ---
 
@@ -307,8 +301,8 @@ Clone o repositório e instale as dependências.
 1. **Clone o repositório:**
 
 ```bash
-git clone https://github.com/SEU-USUARIO/sistema-moeda-estudantil.git
-cd sistema-moeda-estudantil
+git clone https://github.com/fillmello/lab03_rounds.git
+cd lab03_rounds
 ```
 
 2. **Instale as dependências** _(ajuste à stack escolhida)_:
