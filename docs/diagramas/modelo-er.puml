@@ -1,0 +1,91 @@
+@startuml modelo-er
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+
+title Sistema de Moeda Estudantil - Modelo Entidade-Relacionamento
+
+entity USUARIO {
+  * id : BIGINT <<PK>>
+  --
+  nome : VARCHAR(120)
+  email : VARCHAR(254) <<UK>>
+  login : VARCHAR(150) <<UK>>
+  senha_hash : VARCHAR(128)
+}
+
+entity ALUNO {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  cpf : VARCHAR(11) <<UK>>
+  rg : VARCHAR(20)
+  endereco : VARCHAR(255)
+  curso : VARCHAR(120)
+  saldo : INTEGER
+  instituicao_id : BIGINT <<FK>>
+}
+
+entity PROFESSOR {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  cpf : VARCHAR(11) <<UK>>
+  departamento : VARCHAR(120)
+  saldo : INTEGER
+  instituicao_id : BIGINT <<FK>>
+}
+
+entity EMPRESA_PARCEIRA {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  cnpj : VARCHAR(14) <<UK>>
+}
+
+entity INSTITUICAO_ENSINO {
+  * id : BIGINT <<PK>>
+  --
+  nome : VARCHAR(150) <<UK>>
+}
+
+entity VANTAGEM {
+  * id : BIGINT <<PK>>
+  --
+  descricao : TEXT
+  foto : VARCHAR(255)
+  custo_em_moedas : INTEGER
+  empresa_id : BIGINT <<FK>>
+}
+
+entity ENVIO_MOEDA {
+  * id : BIGINT <<PK>>
+  --
+  data : DATETIME
+  quantidade : INTEGER
+  motivo : TEXT
+  professor_id : BIGINT <<FK>>
+  aluno_id : BIGINT <<FK>>
+}
+
+entity TROCA_VANTAGEM {
+  * id : BIGINT <<PK>>
+  --
+  data : DATETIME
+  quantidade : INTEGER
+  codigo : VARCHAR(64) <<UK>>
+  aluno_id : BIGINT <<FK>>
+  vantagem_id : BIGINT <<FK>>
+}
+
+USUARIO ||--o| ALUNO : especializa
+USUARIO ||--o| PROFESSOR : especializa
+USUARIO ||--o| EMPRESA_PARCEIRA : especializa
+
+INSTITUICAO_ENSINO ||--o{ ALUNO : possui
+INSTITUICAO_ENSINO ||--o{ PROFESSOR : possui
+EMPRESA_PARCEIRA ||--o{ VANTAGEM : oferece
+PROFESSOR ||--o{ ENVIO_MOEDA : realiza
+ALUNO ||--o{ ENVIO_MOEDA : recebe
+ALUNO ||--o{ TROCA_VANTAGEM : realiza
+VANTAGEM ||--o{ TROCA_VANTAGEM : participa
+
+@enduml

@@ -124,8 +124,8 @@
 
 | Sprint | Pontos | Entregas | Status |
 |--------|--------|----------|--------|
-| **Lab03S01** | 6 | Casos de Uso, Histórias do Usuário, Diagrama de Classes, Diagrama de Componentes | 🟡 Em andamento |
-| **Lab03S02** | 7 | Modelo ER, estratégia de acesso a dados (ORM/DAO), CRUD inicial de aluno e empresa parceira | ⚪ Pendente |
+| **Lab03S01** | 6 | Casos de Uso, Histórias do Usuário, Diagrama de Classes, Diagrama de Componentes | ✅ Concluída |
+| **Lab03S02** | 7 | Modelo ER, estratégia de acesso a dados (ORM/DAO), CRUD inicial de aluno e empresa parceira | 🟡 Em andamento |
 | **Lab03S03** | 7 | CRUD final, apresentação da arquitetura e persistência, tutorial das tecnologias (~20 min) | ⚪ Pendente |
 
 ---
@@ -145,24 +145,25 @@
 
 ## 🛠 Tecnologias Utilizadas
 
-> 🚧 _Stack a ser definida pelo grupo. Preencha conforme as decisões tomadas (a escolha também será apresentada no tutorial da Sprint 03). Recomenda-se listar as versões utilizadas para garantir a compatibilidade._
+Stack definida para a Sprint 2: **Python 3.12**, **FastAPI**, **SQLAlchemy** e **Alembic**. O front-end inicial utilizará templates Jinja2, HTML, CSS e JavaScript. O desenvolvimento usará SQLite; a configuração de produção poderá utilizar PostgreSQL.
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** _[Ex: React v18, Thymeleaf, Angular v17]_
-* **Linguagem/Superset:** _[Ex: TypeScript, JavaScript ES6+]_
-* **Estilização:** _[Ex: Tailwind CSS, Bootstrap, Material UI]_
-* **Gerenciamento de Estado:** _[Ex: Redux Toolkit, Zustand, Context API]_
-* **Build Tool:** _[Ex: Vite, Webpack]_
+* **Framework/Biblioteca:** Templates Jinja2 integrados ao FastAPI
+* **Linguagem:** HTML, CSS e JavaScript
+* **Estilização:** CSS
+* **Gerenciamento de Estado:** Não aplicável nesta versão server-side
+* **Build Tool:** Não aplicável
 
 ### 🖥️ Back-end
 
-* **Linguagem/Runtime:** _[Ex: Java 17, Node.js 20, Python 3.11]_
-* **Framework:** _[Ex: Spring Boot, NestJS, Django]_
-* **Banco de Dados:** _[Ex: PostgreSQL, MySQL]_
-* **ORM / Query Builder:** _[Ex: Hibernate/JPA, Prisma, TypeORM]_
-* **Autenticação:** _[Ex: JWT, Spring Security]_
-* **E-mail:** _[Ex: JavaMail, Nodemailer, SendGrid]_
+* **Linguagem/Runtime:** Python 3.12
+* **Framework:** FastAPI
+* **Banco de Dados:** SQLite no desenvolvimento; PostgreSQL em produção
+* **ORM / Query Builder:** SQLAlchemy 2
+* **Migrações:** Alembic
+* **Autenticação:** OAuth2/JWT com utilitários do FastAPI
+* **E-mail:** SMTP com `smtplib`
 
 ### 📱 Mobile (Opcional)
 
@@ -185,13 +186,20 @@
 
 ## 🏗 Arquitetura
 
-O sistema segue o padrão **MVC (Model-View-Controller)**, com uma camada de **Service** para regras de negócio e uma camada de **Repository** (DAO/ORM, definida na Sprint 02) para persistência. Essa separação isola as regras de saldo, cupom e notificação das telas e do acesso a dados, facilitando testes e manutenção.
+O sistema segue o padrão **MVC (Model-View-Controller)**, organizado em FastAPI com camadas de Controller, Service, Model e Repository. As regras de negócio ficarão na camada de serviços, enquanto SQLAlchemy e Alembic cuidarão do mapeamento e da persistência no banco de dados.
 
 - **Model:** entidades de domínio (`Usuario`, `Aluno`, `Professor`, `EmpresaParceira`, `InstituicaoEnsino`, `Vantagem`, `Transacao`, `EnvioMoeda`, `TrocaVantagem`).
 - **View:** telas de login, cadastro, envio de moedas, extrato, catálogo de vantagens e troca.
 - **Controller:** recebe as requisições e orquestra os casos de uso.
 - **Service:** regras de saldo, crédito semestral, geração do código do cupom e notificações.
-- **Repository:** acesso ao banco de dados.
+- **Repository:** interfaces e consultas implementadas com SQLAlchemy.
+
+**Estratégia de persistência (Sprint 2)**
+- O grupo adotará o **SQLAlchemy 2** para mapear Models para tabelas relacionais.
+- As alterações de estrutura serão controladas por migrations do **Alembic**.
+- A herança de `Usuario` será mapeada com uma tabela base `USUARIO` e tabelas `ALUNO`, `PROFESSOR` e `EMPRESA_PARCEIRA` ligadas por chave primária compartilhada.
+- `Transacao` é abstrata no domínio; no banco, `ENVIO_MOEDA` e `TROCA_VANTAGEM` terão suas próprias tabelas.
+- O saldo será armazenado nas tabelas de aluno e professor e atualizado junto com as transações por regras da camada de serviço.
 
 **Decisões arquiteturais importantes**
 - `Transacao` é **abstrata**, com as especializações `EnvioMoeda` (professor → aluno, com motivo) e `TrocaVantagem` (aluno → vantagem, com código), pois têm participantes e regras diferentes.
@@ -212,7 +220,7 @@ Os fontes estão em [`docs/diagramas/`](docs/diagramas/) (`.puml`) e as imagens 
 | [`diagrama-de-componentes.puml`](docs/diagramas/diagrama-de-componentes.puml) | [`sequencia-enviar-moedas.puml`](docs/diagramas/sequencia-enviar-moedas.puml) |
 | **Sequência: Trocar Vantagem** | **Modelo ER** |
 | <img src="docs/diagramas/img/sequencia-trocar-vantagem.png" alt="Sequência de troca de vantagem" width="450px"> | _Sprint Lab03S02_ |
-| [`sequencia-trocar-vantagem.puml`](docs/diagramas/sequencia-trocar-vantagem.puml) | — |
+| [`sequencia-trocar-vantagem.puml`](docs/diagramas/sequencia-trocar-vantagem.puml) | [`modelo-er.puml`](docs/diagramas/modelo-er.puml) |
 
 Histórias do Usuário: [`docs/historias-de-usuario.md`](docs/historias-de-usuario.md)
 

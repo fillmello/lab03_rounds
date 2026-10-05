@@ -5,6 +5,7 @@
 | `casos-de-uso.puml` | Diagrama de Casos de Uso |
 | `diagrama-de-classes.puml` | Diagrama de Classes |
 | `diagrama-de-componentes.puml` | Diagrama de Componentes |
+| `modelo-er.puml` | Modelo Entidade-Relacionamento |
 | `sequencia-enviar-moedas.puml` | Sequência do envio de moedas (apoio, Sprint 2/3) |
 | `sequencia-trocar-vantagem.puml` | Sequência da troca por vantagem (apoio, Sprint 2/3) |
 

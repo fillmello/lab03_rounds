@@ -1,48 +1,24 @@
 # Requisitos — Sistema de Moeda Estudantil (Release 1)
 
-## Regras de negócio
+## Requisitos Funcionais
 
-| ID | Regra |
-|----|-------|
-| RN01 | Alunos se cadastram informando **nome, e-mail, CPF, RG, endereço, instituição de ensino e curso**. |
-| RN02 | As **instituições** são pré-cadastradas; o aluno apenas seleciona a sua. |
-| RN03 | **Professores** são pré-cadastrados (lista enviada pela instituição). Armazena-se nome, CPF, departamento e vínculo com a instituição. |
-| RN04 | A cada semestre cada professor recebe **1.000 moedas**. |
-| RN05 | O saldo do professor é **acumulável** entre semestres (saldo restante + 1.000 novas). |
-| RN06 | Para enviar moedas, o professor precisa de **saldo suficiente**, deve indicar o **aluno** e o **motivo** (mensagem aberta, **obrigatória**). |
-| RN07 | O aluno é **notificado por e-mail** ao receber moedas. |
-| RN08 | Professor e aluno consultam o **extrato** (saldo + transações). Professor: envios. Aluno: recebimentos e trocas. |
-| RN09 | Empresas parceiras se cadastram e registram **vantagens** com **descrição, foto e custo em moedas**. |
-| RN10 | Ao resgatar uma vantagem, o custo é **descontado do saldo** do aluno (saldo deve ser suficiente). |
-| RN11 | O sistema gera um **código único** por troca e envia **e-mail de cupom ao aluno** e **e-mail de conferência à empresa**, ambos com o **mesmo código**. |
-| RN12 | Aluno, professor e empresa parceira possuem **login e senha**; toda funcionalidade exige **autenticação**. |
+- **RF01** — O sistema deve permitir que alunos, professores e empresas parceiras realizem login.
+- **RF02** — O sistema deve permitir que o aluno se cadastre informando nome, e-mail, CPF, RG, endereço, instituição de ensino e curso.
+- **RF03** — O sistema deve permitir que a empresa parceira se cadastre informando seus dados e credenciais de acesso.
+- **RF04** — O sistema deve permitir que o professor envie moedas a um aluno, informando quantidade, destinatário e motivo obrigatório.
+- **RF05** — O sistema deve permitir que alunos e professores consultem saldo e extrato de transações.
+- **RF06** — O sistema deve permitir que a empresa parceira cadastre vantagens com descrição, foto e custo em moedas.
+- **RF07** — O sistema deve permitir que o aluno troque moedas por uma vantagem, descontando o custo do seu saldo.
+- **RF08** — O sistema deve permitir que a empresa parceira confira uma troca por meio do código do cupom.
+- **RF09** — O sistema deve enviar notificações por e-mail ao aluno quando ele receber moedas e ao aluno e à empresa quando houver uma troca.
+- **RF10** — O sistema deve gerar um código único para cada troca e enviar o mesmo código ao aluno e à empresa parceira.
+- **RF11** — O sistema deve creditar 1.000 moedas ao professor a cada semestre, acumulando o saldo restante.
 
-## Requisitos funcionais (resumo)
+## Requisitos Não Funcionais
 
-| ID | Requisito | Ator(es) | Regras |
-|----|-----------|----------|--------|
-| RF01 | Realizar login | Aluno, Professor, Empresa | RN12 |
-| RF02 | Cadastrar aluno | Aluno | RN01, RN02 |
-| RF03 | Cadastrar empresa parceira | Empresa | RN09, RN12 |
-| RF04 | Enviar moedas a aluno | Professor | RN04–RN07 |
-| RF05 | Consultar extrato | Aluno, Professor | RN08 |
-| RF06 | Cadastrar vantagem | Empresa | RN09 |
-| RF07 | Trocar moedas por vantagem | Aluno | RN10, RN11 |
-| RF08 | Conferir troca de vantagem (código) | Empresa | RN11 |
-| RF09 | Notificar por e-mail (moeda recebida e cupom) | Sistema | RN07, RN11 |
-| RF10 | Creditar 1.000 moedas por semestre ao professor | Sistema | RN04, RN05 |
-
-## Requisitos não funcionais
-
-- Arquitetura **MVC**.
-- Autenticação obrigatória em todos os fluxos.
-- Persistência em banco de dados (estratégia definida na Sprint 2).
-- Modelos UML versionados no repositório.
-
-## Premissas e decisões de modelagem (revisar em grupo)
-
-1. Cadastro do professor (via lista da instituição) é **carga administrativa**, fora do escopo dos atores do sistema nesta release.
-2. `Transacao` é abstrata, com especializações `EnvioMoeda` (professor → aluno) e `TrocaVantagem` (aluno → vantagem), pois têm participantes e regras distintos.
-3. O código do cupom é atributo de `TrocaVantagem` e é o mesmo enviado aos dois e-mails.
-4. Empresa parceira é modelada como especialização de `Usuario` para reaproveitar a autenticação.
-5. O crédito semestral é feito por rotina do sistema (`Professor.creditarSemestre()`), somando 1.000 ao saldo existente.
+- **RNF01** — O sistema deve utilizar arquitetura **MVC**.
+- **RNF02** — O sistema deve exigir autenticação nos fluxos protegidos.
+- **RNF03** — O sistema deve persistir os dados em banco de dados; a estratégia será definida na Sprint 2.
+- **RNF04** — Os modelos UML devem ser versionados no repositório.
+- **RNF05** — O sistema deve representar `Usuario` como classe abstrata de autenticação, com `Aluno`, `Professor` e `EmpresaParceira` como especializações.
+- **RNF06** — O sistema deve representar `Transacao` como classe abstrata, especializada em `EnvioMoeda` e `TrocaVantagem`.

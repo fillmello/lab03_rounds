@@ -8,7 +8,6 @@ actor Usuario <<abstract>>
 actor Aluno
 actor Professor
 actor "Empresa Parceira" as Empresa
-actor "Agendador\n(semestral)" as Agendador
 actor "Servidor de\nE-mail" as Email <<sistema externo>>
 
 rectangle "Sistema de Moeda Estudantil" {
@@ -19,7 +18,6 @@ rectangle "Sistema de Moeda Estudantil" {
   usecase "Trocar moedas por vantagem" as UC05
   usecase "Cadastrar vantagem" as UC06
   usecase "Conferir troca de vantagem" as UC07
-  usecase "Creditar moedas semestrais" as UC08
   usecase "Enviar e-mail de notificacao" as UC09
 }
 
@@ -39,7 +37,6 @@ Usuario <|-- Aluno
 Usuario <|-- Professor
 Usuario <|-- Empresa
 
-Agendador --> UC08
 UC09 --> Email
 
 UC03 ..> UC09 : <<include>>
