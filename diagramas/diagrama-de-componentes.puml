@@ -34,16 +34,4 @@ Vantagens --> DB
 
 Notif --> SMTP
 
-note right of Auth
-  Login e validacao de senha
-  de todos os perfis
-end note
-note right of Moedas
-  Envio de moedas, extrato,
-  regras de saldo e credito semestral
-end note
-note right of Vantagens
-  Cadastro de vantagens, troca,
-  geracao de codigo do cupom
-end note
 @enduml
