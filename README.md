@@ -145,15 +145,15 @@
 
 ## 🛠 Tecnologias Utilizadas
 
-Stack definida para a Sprint 2: **Python 3.12**, **FastAPI**, **SQLAlchemy** e **Alembic**. O front-end inicial utilizará templates Jinja2, HTML, CSS e JavaScript. O desenvolvimento usará SQLite; a configuração de produção poderá utilizar PostgreSQL.
+Stack definida para a Sprint 2: **Next.js**, **React**, **TypeScript**, **Python 3.12**, **FastAPI**, **SQLAlchemy** e **Alembic**. O desenvolvimento usará SQLite; a configuração de produção poderá utilizar PostgreSQL.
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** Templates Jinja2 integrados ao FastAPI
-* **Linguagem:** HTML, CSS e JavaScript
+* **Framework/Biblioteca:** Next.js e React
+* **Linguagem:** TypeScript
 * **Estilização:** CSS
-* **Gerenciamento de Estado:** Não aplicável nesta versão server-side
-* **Build Tool:** Não aplicável
+* **Gerenciamento de Estado:** Estado local dos componentes React
+* **Build Tool:** Next.js
 
 ### 🖥️ Back-end
 
@@ -186,7 +186,7 @@ Stack definida para a Sprint 2: **Python 3.12**, **FastAPI**, **SQLAlchemy** e *
 
 ## 🏗 Arquitetura
 
-O sistema segue o padrão **MVC (Model-View-Controller)**, organizado em FastAPI com camadas de Controller, Service, Model e Repository. As regras de negócio ficarão na camada de serviços, enquanto SQLAlchemy e Alembic cuidarão do mapeamento e da persistência no banco de dados.
+O sistema segue o padrão **MVC (Model-View-Controller)**, organizado em FastAPI com camadas de Controller, Service, Model, Repository e View. A interface web usa templates Jinja2, HTML, CSS e JavaScript e consome a API por `fetch`. As regras de negócio ficam na camada de serviços, enquanto SQLAlchemy e Alembic cuidam do mapeamento e da persistência no banco de dados.
 
 - **Model:** entidades de domínio (`Usuario`, `Aluno`, `Professor`, `EmpresaParceira`, `InstituicaoEnsino`, `Vantagem`, `Transacao`, `EnvioMoeda`, `TrocaVantagem`).
 - **View:** telas de login, cadastro, envio de moedas, extrato, catálogo de vantagens e troca.
@@ -195,7 +195,7 @@ O sistema segue o padrão **MVC (Model-View-Controller)**, organizado em FastAPI
 - **Repository:** interfaces e consultas implementadas com SQLAlchemy.
 
 **Estratégia de persistência (Sprint 2)**
-- O grupo adotará o **SQLAlchemy 2** para mapear Models para tabelas relacionais.
+- O grupo adotou o **SQLAlchemy 2 ORM** para mapear Models para tabelas relacionais; não será utilizado DAO manual.
 - As alterações de estrutura serão controladas por migrations do **Alembic**.
 - A herança de `Usuario` será mapeada com uma tabela base `USUARIO` e tabelas `ALUNO`, `PROFESSOR` e `EMPRESA_PARCEIRA` ligadas por chave primária compartilhada.
 - `Transacao` é abstrata no domínio; no banco, `ENVIO_MOEDA` e `TROCA_VANTAGEM` terão suas próprias tabelas.
@@ -274,7 +274,7 @@ Crie um arquivo **`.env`** na raiz da pasta do front-end. Em projetos **Vite**, 
 
 | Variável | Descrição | Exemplo |
 | :--- | :--- | :--- |
-| `API_URL` (ou `VITE_API_URL`) | URL base da API consumida pelo front-end. | `http://localhost:8080/api` |
+| `API_URL` | URL base da API consumida pelo front-end. | `http://localhost:8000/api` |
 
 ---
 
@@ -337,18 +337,27 @@ alembic upgrade head
 
 > No desenvolvimento, a aplicação cria as tabelas automaticamente ao iniciar. As migrações Alembic controlam a estrutura do banco em ambientes persistentes.
 
-3. **Carga inicial:** as **instituições** e os **professores** são pré-cadastrados; descreva aqui o script/seed que popula esses dados.
+3. **Carga inicial:** ao iniciar, a aplicação cria automaticamente instituições pré-cadastradas para uso no formulário de aluno. Os professores podem ser incluídos por seed conforme a lista enviada pela instituição.
 
 ---
 
 ### ⚡ Como Executar a Aplicação
-Execute a aplicação FastAPI em modo de desenvolvimento:
+Execute o back-end e o front-end em terminais separados.
 
 ```bash
 source .venv/bin/activate  # macOS/Linux
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
-🚀 *A API estará disponível em **http://localhost:8000** e a documentação interativa em **http://localhost:8000/docs**.*
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+🚀 *A API estará disponível em **http://localhost:8000** e o front-end em **http://localhost:3000**.*
 
 ---
 

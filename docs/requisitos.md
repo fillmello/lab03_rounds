@@ -18,7 +18,7 @@
 
 - **RNF01** — O sistema deve utilizar arquitetura **MVC**.
 - **RNF02** — O sistema deve exigir autenticação nos fluxos protegidos.
-- **RNF03** — O sistema deve persistir os dados em banco de dados; a estratégia será definida na Sprint 2.
+- **RNF03** — O sistema deve persistir os dados em banco de dados usando SQLAlchemy 2 ORM, com migrações controladas pelo Alembic.
 - **RNF04** — Os modelos UML devem ser versionados no repositório.
 - **RNF05** — O sistema deve representar `Usuario` como classe abstrata de autenticação, com `Aluno`, `Professor` e `EmpresaParceira` como especializações.
 - **RNF06** — O sistema deve representar `Transacao` como classe abstrata, especializada em `EnvioMoeda` e `TrocaVantagem`.
