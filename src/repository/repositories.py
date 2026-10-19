@@ -1,0 +1,24 @@
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from src.model.entities import Aluno, EmpresaParceira, InstituicaoEnsino, Usuario
+
+
+def find_user_by_credentials(db: Session, login: str) -> Usuario | None:
+    return db.scalar(select(Usuario).where(Usuario.login == login))
+
+
+def find_institution(db: Session, institution_id: int) -> InstituicaoEnsino | None:
+    return db.get(InstituicaoEnsino, institution_id)
+
+
+def email_or_login_in_use(db: Session, email: str, login: str) -> bool:
+    return db.scalar(select(Usuario.id).where((Usuario.email == email) | (Usuario.login == login))) is not None
+
+
+def cpf_in_use(db: Session, cpf: str) -> bool:
+    return db.scalar(select(Aluno.id).where(Aluno.cpf == cpf)) is not None
+
+
+def cnpj_in_use(db: Session, cnpj: str) -> bool:
+    return db.scalar(select(EmpresaParceira.id).where(EmpresaParceira.cnpj == cnpj)) is not None

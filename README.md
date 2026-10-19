@@ -245,9 +245,9 @@ Histórias do Usuário: [`docs/historias-de-usuario.md`](docs/historias-de-usuar
 ### Pré-requisitos
 Certifique-se de que o usuário tenha o ambiente configurado.
 
-* **[Linguagem/Runtime]:** _versão_ (Ex: Java JDK 17+ ou Node.js LTS)
-* **Gerenciador de Pacotes / Build:** _[npm, yarn, Maven, Gradle, pip...]_
-* **Banco de Dados:** _[PostgreSQL, MySQL...]_
+* **Linguagem/Runtime:** Python 3.12+
+* **Gerenciador de Pacotes / Build:** pip
+* **Banco de Dados:** SQLite (desenvolvimento) ou PostgreSQL (produção)
 * **Docker** (Opcional, mas **altamente recomendado** para rodar o Banco de Dados)
 
 ---
@@ -260,10 +260,8 @@ Crie arquivos `.env` específicos e/ou configure as variáveis de ambiente no se
 
 | Variável | Descrição | Exemplo |
 | :--- | :--- | :--- |
-| `SERVER_PORT` | Porta do back-end. | `8080` |
-| `DB_URL` | URL de conexão com o banco. | `jdbc:postgresql://localhost:5432/moeda_estudantil` |
-| `DB_USER` | Usuário do banco. | `postgres` |
-| `DB_PASSWORD` | Senha do banco. | `senha-segura-123` |
+| `SERVER_PORT` | Porta do back-end. | `8000` |
+| `DATABASE_URL` | URL de conexão do SQLAlchemy. | `sqlite:///./moeda_estudantil.db` |
 | `JWT_SECRET` | Segredo para assinatura de tokens (se aplicável). | `chave_super_segura_base64` |
 | `MAIL_HOST` | Servidor SMTP para envio de e-mails. | `smtp.gmail.com` |
 | `MAIL_PORT` | Porta SMTP. | `587` |
@@ -288,9 +286,7 @@ Nos provedores, as variáveis são configuradas no painel do projeto (ex.: Verce
 
 ```
 # Back-end
-DB_URL=jdbc:postgresql://<host>:5432/moeda_estudantil
-DB_USER=<usuario>
-DB_PASSWORD=<senha>
+DATABASE_URL=postgresql+psycopg://<usuario>:<senha>@<host>:5432/moeda_estudantil
 MAIL_HOST=smtp.exemplo.com
 MAIL_PORT=587
 MAIL_USER=<email-remetente>
@@ -313,28 +309,12 @@ git clone https://github.com/fillmello/lab03_rounds.git
 cd lab03_rounds
 ```
 
-2. **Instale as dependências** _(ajuste à stack escolhida)_:
-
-#### Front-end
+2. **Instale as dependências do FastAPI:**
 
 ```bash
-cd frontend
-npm install
-# ou
-yarn install
-cd ..
-```
-
-#### Back-end
-
-```bash
-# Exemplo Maven
-cd backend
-./mvnw clean install
-cd ..
-
-# Exemplo Node.js
-# cd backend && npm install
+python3 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+python -m pip install -r requirements.txt
 ```
 
 ---
@@ -349,33 +329,26 @@ _Exemplo com PostgreSQL via Docker:_
 docker run --name moeda_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=senha-segura-123 -e POSTGRES_DB=moeda_estudantil -p 5432:5432 -d postgres:16
 ```
 
-2. **Execute as Migrações:**  
-   _[descrever se o schema é gerado pelo ORM (ex.: Hibernate `ddl-auto`) ou por Flyway/Liquibase/scripts SQL]_
+2. **Execute as migrações:**
+
+```bash
+alembic upgrade head
+```
+
+> No desenvolvimento, a aplicação cria as tabelas automaticamente ao iniciar. As migrações Alembic controlam a estrutura do banco em ambientes persistentes.
 
 3. **Carga inicial:** as **instituições** e os **professores** são pré-cadastrados; descreva aqui o script/seed que popula esses dados.
 
 ---
 
 ### ⚡ Como Executar a Aplicação
-Execute a aplicação em modo de desenvolvimento em **dois terminais separados** (caso back-end e front-end sejam projetos distintos).
-
-#### Terminal 1: Back-end
+Execute a aplicação FastAPI em modo de desenvolvimento:
 
 ```bash
-# _[comando de execução do back-end]_
-# Ex.: cd backend && ./mvnw spring-boot:run
+source .venv/bin/activate  # macOS/Linux
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
-🚀 *O Back-end estará disponível em **http://localhost:8080** (ajuste conforme a stack).*
-
----
-
-#### Terminal 2: Front-end
-
-```bash
-# _[comando de execução do front-end, se separado]_
-# Ex.: cd frontend && npm run dev
-```
-🎨 *O Front-end estará disponível em **http://localhost:5173** (ou a porta configurada).*
+🚀 *A API estará disponível em **http://localhost:8000** e a documentação interativa em **http://localhost:8000/docs**.*
 
 ---
 
@@ -437,20 +410,20 @@ _[Descrever build de produção, variáveis do ambiente e comando de execução,
 1. **Build do Projeto:**
 
 ```bash
-# Exemplo genérico
-# 1. build do front-end (ex.: npm run build)
-# 2. build do back-end (ex.: ./mvnw clean package)
+# Instalação das dependências
+python -m pip install -r requirements.txt
+# Execução da API
+uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
 
 2. **Configuração do Ambiente de Produção:** defina as variáveis de ambiente no provedor escolhido (e.g., Vercel, Railway, Heroku, DigitalOcean).
 
-> 🔑 **Variáveis Cruciais:** configure a conexão com o banco de dados (`DB_URL`, `DB_USER`, `DB_PASSWORD`), o servidor de e-mail (`MAIL_*`) e a URL da API de produção para o front-end.
+> 🔑 **Variáveis Cruciais:** configure a conexão com o banco de dados (`DATABASE_URL`), o servidor de e-mail (`MAIL_*`) e o segredo de autenticação (`JWT_SECRET`).
 
 3. **Execução em Produção:**
 
 ```bash
-# Exemplo genérico: executar o artefato gerado
-# java -jar backend/target/nome-do-projeto.jar
+uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
 
 ---
