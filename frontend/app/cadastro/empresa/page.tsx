@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { apiRequest } from "../../../lib/api";
+import { apiRequest, errorText } from "../../../lib/api";
 
 export default function CompanyRegistrationPage() {
   const [message, setMessage] = useState("");
@@ -10,7 +10,8 @@ export default function CompanyRegistrationPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget; // currentTarget vira null depois de um await
+    const form = new FormData(formElement);
     const payload = Object.fromEntries(form);
     payload.cnpj = String(payload.cnpj).replace(/\D/g, "");
     try {
@@ -20,10 +21,10 @@ export default function CompanyRegistrationPage() {
       });
       setError(false);
       setMessage(`Cadastro realizado. Seu ID é ${company.id}.`);
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (reason) {
       setError(true);
-      setMessage(reason instanceof Error ? reason.message : "Não foi possível concluir o cadastro.");
+      setMessage(errorText(reason, "Não foi possível concluir o cadastro."));
     }
   }
 
@@ -40,7 +41,7 @@ export default function CompanyRegistrationPage() {
           <Field label="CNPJ" name="cnpj" />
           <Field label="E-mail" name="email" type="email" />
           <Field label="Login" name="login" />
-          <Field label="Senha" name="senha" type="password" />
+          <Field label="Senha (mínimo 8 caracteres)" name="senha" type="password" />
           <button type="submit">Cadastrar empresa</button>
         </form>
         <p className={`form-message ${error ? "error" : ""}`}>{message}</p>
@@ -51,5 +52,6 @@ export default function CompanyRegistrationPage() {
 }
 
 function Field({ label, name, type = "text" }: { label: string; name: string; type?: string }) {
-  return <label>{label}<input name={name} type={type} required /></label>;
+  const isPassword = type === "password";
+  return <label>{label}<input name={name} type={type} required minLength={isPassword ? 8 : undefined} maxLength={isPassword ? 128 : undefined} autoComplete={isPassword ? "new-password" : undefined} /></label>;
 }

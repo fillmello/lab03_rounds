@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { apiRequest } from "../../../lib/api";
+import { apiRequest, errorText } from "../../../lib/api";
 
 type Institution = { id: number; nome: string };
 
@@ -17,7 +17,8 @@ export default function StudentRegistrationPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget; // currentTarget vira null depois de um await
+    const form = new FormData(formElement);
     const onlyDigits = (value: FormDataEntryValue | null) => String(value || "").replace(/\D/g, "");
     try {
       const student = await apiRequest<{ id: number }>("/alunos", {
@@ -31,10 +32,10 @@ export default function StudentRegistrationPage() {
       });
       setError(false);
       setMessage(`Cadastro realizado. Seu ID é ${student.id}.`);
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (reason) {
       setError(true);
-      setMessage(reason instanceof Error ? reason.message : "Não foi possível concluir o cadastro.");
+      setMessage(errorText(reason, "Não foi possível concluir o cadastro."));
     }
   }
 
@@ -51,7 +52,7 @@ export default function StudentRegistrationPage() {
             <Field label="Nome completo" name="nome" />
             <Field label="E-mail" name="email" type="email" />
             <Field label="Login" name="login" />
-            <Field label="Senha" name="senha" type="password" />
+            <Field label="Senha (mínimo 8 caracteres)" name="senha" type="password" />
             <Field label="CPF" name="cpf" />
             <Field label="RG" name="rg" />
             <Field label="Endereço" name="endereco" wide />
@@ -68,5 +69,6 @@ export default function StudentRegistrationPage() {
 }
 
 function Field({ label, name, type = "text", wide = false }: { label: string; name: string; type?: string; wide?: boolean }) {
-  return <label className={wide ? "span-two" : ""}>{label}<input name={name} type={type} required /></label>;
+  const isPassword = type === "password";
+  return <label className={wide ? "span-two" : ""}>{label}<input name={name} type={type} required minLength={isPassword ? 8 : undefined} maxLength={isPassword ? 128 : undefined} autoComplete={isPassword ? "new-password" : undefined} /></label>;
 }

@@ -38,9 +38,9 @@ export default function LoginPage() {
         <p className="muted">Use seus dados para continuar.</p>
         <form className="form-stack" onSubmit={submit}>
           <label htmlFor="login">Login</label>
-          <input id="login" name="login" required />
+          <input id="login" name="login" autoComplete="username" required />
           <label htmlFor="senha">Senha</label>
-          <input id="senha" name="senha" type="password" required />
+          <input id="senha" name="senha" type="password" autoComplete="current-password" required />
           <button type="submit">Entrar</button>
         </form>
         <p className={`form-message ${error ? "error" : ""}`}>{message}</p>

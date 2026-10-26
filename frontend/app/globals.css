@@ -76,3 +76,9 @@ button:hover { background: var(--accent-dark); }
 .success-box { margin: 18px 0 0; padding: 14px; color: var(--accent-dark); background: #edf5ee; border: 1px solid #c9dfcc; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 @media (max-width: 760px) { .site-header { padding: 0 18px; } nav { gap: 12px; font-size: .78rem; } .auth-page { grid-template-columns: 1fr; gap: 42px; padding-top: 58px; } .auth-panel { max-width: 450px; } .form-page, .dashboard { padding: 58px 18px; } .form-grid { grid-template-columns: 1fr; } .span-two { grid-column: auto; } .dashboard-top { display: block; } .dashboard-top .secondary-button { margin-top: 18px; } .management-heading, .record-card, .password-card { display: block; } .type-filter { display: grid; margin-top: 18px; } .record-actions { margin-top: 18px; } .password-card button { width: 100%; margin-top: 18px; } }
+textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 2px; color: var(--ink); background: var(--white); font: inherit; resize: vertical; }
+textarea:focus { outline: 2px solid #b9d3bf; border-color: var(--accent); }
+.record-media { display: flex; align-items: center; gap: 16px; }
+.thumb { width: 72px; height: 72px; flex: none; object-fit: cover; border: 1px solid var(--line); background: var(--paper); }
+input[type="file"] { padding: 9px 12px; }
+@media (max-width: 760px) { .record-media { align-items: flex-start; } .record-card > button { width: 100%; margin-top: 18px; } }
