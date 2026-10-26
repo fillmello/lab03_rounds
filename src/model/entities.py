@@ -1,9 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
+
+
+def utcnow() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class Usuario(Base):
@@ -76,7 +80,7 @@ class Vantagem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     descricao: Mapped[str] = mapped_column(Text, nullable=False)
-    # Mantido para compatibilidade com bancos criados em versões anteriores.
+    # Nome do arquivo salvo em uploads/ (vazio quando não há foto).
     foto: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     custo_em_moedas: Mapped[int] = mapped_column(Integer, nullable=False)
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresa_parceira.id"), nullable=False)
@@ -84,12 +88,20 @@ class Vantagem(Base):
     empresa: Mapped[EmpresaParceira] = relationship(back_populates="vantagens")
     trocas: Mapped[list["TrocaVantagem"]] = relationship(back_populates="vantagem")
 
+    @property
+    def empresa_nome(self) -> str:
+        return self.empresa.nome
+
+    @property
+    def foto_url(self) -> str | None:
+        return f"/uploads/{self.foto}" if self.foto else None
+
 
 class EnvioMoeda(Base):
     __tablename__ = "envio_moeda"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    data: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    data: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
     quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
     motivo: Mapped[str] = mapped_column(Text, nullable=False)
     professor_id: Mapped[int] = mapped_column(ForeignKey("professor.id"), nullable=False)
@@ -97,15 +109,31 @@ class EnvioMoeda(Base):
     professor: Mapped[Professor] = relationship()
     aluno: Mapped[Aluno] = relationship()
 
+    @property
+    def professor_nome(self) -> str:
+        return self.professor.nome
+
+    @property
+    def aluno_nome(self) -> str:
+        return self.aluno.nome
+
 
 class TrocaVantagem(Base):
     __tablename__ = "troca_vantagem"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    data: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    data: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
     quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
     codigo: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     aluno_id: Mapped[int] = mapped_column(ForeignKey("aluno.id"), nullable=False)
     vantagem_id: Mapped[int] = mapped_column(ForeignKey("vantagem.id"), nullable=False)
     aluno: Mapped[Aluno] = relationship()
     vantagem: Mapped[Vantagem] = relationship(back_populates="trocas")
+
+    @property
+    def aluno_nome(self) -> str:
+        return self.aluno.nome
+
+    @property
+    def vantagem_descricao(self) -> str:
+        return self.vantagem.descricao

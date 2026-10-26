@@ -1,14 +1,19 @@
 from contextlib import asynccontextmanager
-from datetime import datetime
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-from src.controller.routes import router
+from src.controller import router
+from src.controller.validation import validation_error_handler
 from src.database import SessionLocal, create_tables
-from src.model.entities import InstituicaoEnsino
-from src.model.entities import Professor
+from src.model.entities import InstituicaoEnsino, Professor
+from src.service import fotos, semestre
 from src.service.auth import hash_password
+from src.service.errors import ServiceError
+from src.settings import settings
 
 
 @asynccontextmanager
@@ -24,43 +29,45 @@ async def lifespan(_: FastAPI):
                 ]
             )
             db.commit()
-        # A conta institucional é criada uma única vez e mantém o saldo
-        # acumulável entre reinícios da aplicação.
+        # Professor de demonstração, criado uma única vez (o saldo acumula entre reinícios).
         if db.query(Professor).count() == 0:
             institution = db.query(InstituicaoEnsino).order_by(InstituicaoEnsino.id).first()
-            db.add(
-                Professor(
-                    nome="Professor Institucional",
-                    email="professor@moeda.local",
-                    login="professor",
-                    senha_hash=hash_password("professor123"),
-                    cpf="11111111112",
-                    departamento="Geral",
-                    instituicao_id=institution.id,
-                    saldo=1000,
-                    ultimo_credito_semestre=f"{datetime.utcnow().year}-{'1' if datetime.utcnow().month <= 6 else '2'}",
-                )
+            professor = Professor(
+                nome="Professor Institucional",
+                email="professor@moeda.local",
+                login="professor",
+                senha_hash=hash_password("professor123"),
+                cpf="52998224725",
+                departamento="Geral",
+                instituicao_id=institution.id,
+                saldo=0,
             )
+            semestre.credit_if_due(professor)
+            db.add(professor)
             db.commit()
         else:
-            semester = f"{datetime.utcnow().year}-{'1' if datetime.utcnow().month <= 6 else '2'}"
-            for professor in db.query(Professor).all():
-                if professor.ultimo_credito_semestre != semester:
-                    professor.saldo += 1000
-                    professor.ultimo_credito_semestre = semester
-            db.commit()
+            semestre.credit_all_due(db)
     yield
 
 
 app = FastAPI(title="Sistema de Moeda Estudantil", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(ServiceError)
+async def service_error_handler(_: Request, exc: ServiceError) -> JSONResponse:
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
+app.add_exception_handler(RequestValidationError, validation_error_handler)
 app.include_router(router, prefix="/api")
+app.mount("/uploads", StaticFiles(directory=fotos.upload_dir()), name="uploads")
 
 
 @app.get("/health")
