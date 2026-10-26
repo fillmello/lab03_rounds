@@ -106,10 +106,12 @@ function StatementPanel({ statement, outgoing = false }: { statement: Statement;
 function PasswordDialog({ notify }: { notify: (message: string, error?: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [modalError, setModalError] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = Object.fromEntries(new FormData(event.currentTarget));
+    setModalError("");
     setBusy(true);
     try {
       await apiRequest("/me/senha", {
@@ -124,34 +126,52 @@ function PasswordDialog({ notify }: { notify: (message: string, error?: boolean)
       setOpen(false);
       event.currentTarget.reset();
     } catch (reason) {
-      notify(reason instanceof Error ? reason.message : "Não foi possível alterar a senha.", true);
+      setModalError(reason instanceof Error ? reason.message : "Não foi possível alterar a senha.");
     } finally {
       setBusy(false);
     }
   }
 
   return <>
-    <button type="button" className="secondary-button password-button" onClick={() => setOpen(true)}>
-      Mudar senha
-    </button>
+    <section className="password-card">
+      <div>
+        <span className="record-id">Segurança da conta</span>
+        <h2>Mudar senha</h2>
+        <p className="muted">Atualize sua senha usando a senha atual para confirmar sua identidade.</p>
+      </div>
+      <button type="button" className="secondary-button" onClick={() => { setModalError(""); setOpen(true); }}>
+        Mudar senha
+      </button>
+    </section>
     {open && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget) setOpen(false);
     }}>
       <section className="modal panel" role="dialog" aria-modal="true" aria-labelledby="password-title">
         <h2 id="password-title">Mudar senha</h2>
         <p className="muted">Confirme sua senha atual para definir uma nova.</p>
+        {modalError && <p className="modal-error" role="alert">{modalError}</p>}
         <form className="form-stack" onSubmit={submit}>
-          <Field label="Senha atual" name="senha_atual" type="password" />
-          <Field label="Nova senha" name="nova_senha" type="password" />
-          <Field label="Confirmar nova senha" name="confirmacao" type="password" />
+          <PasswordField label="Senha atual" name="senha_atual" />
+          <PasswordField label="Nova senha" name="nova_senha" />
+          <PasswordField label="Confirmar nova senha" name="confirmacao" />
           <div className="modal-actions">
-            <button type="submit" disabled={busy}>{busy ? "Salvando..." : "Salvar nova senha"}</button>
-            <button type="button" className="secondary-button" onClick={() => setOpen(false)}>Cancelar</button>
+            <button type="submit" className="full-width-submit" disabled={busy}>{busy ? "Salvando..." : "Salvar nova senha"}</button>
+            <button type="button" className="secondary-button full-width-submit" onClick={() => setOpen(false)}>Cancelar</button>
           </div>
         </form>
       </section>
     </div>}
   </>;
+}
+
+function PasswordField({ label, name }: { label: string; name: string }) {
+  const [visible, setVisible] = useState(false);
+  return <label>{label}<span className="password-input">
+    <input name={name} type={visible ? "text" : "password"} required />
+    <button type="button" className="visibility-button" onClick={() => setVisible((current) => !current)}>
+      {visible ? "Ocultar" : "Visualizar"}
+    </button>
+  </span></label>;
 }
 
 function Field({ label, name, type = "text", defaultValue, wide = false }: { label: string; name: string; type?: string; defaultValue?: string | number; wide?: boolean }) {

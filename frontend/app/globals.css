@@ -51,11 +51,18 @@ button:hover { background: var(--accent-dark); }
 .danger-button:hover { color: var(--white); background: #a33d37; }
 .edit-form .form-grid { margin: 18px 0; }
 .empty-state { padding: 28px 0; color: var(--muted); }
-.password-button { margin-top: 16px; }
+.password-card { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px; border: 1px solid var(--line); background: var(--white); }
+.password-card h2 { margin: 6px 0 8px; }
+.password-card .muted { margin: 0; }
 .full-width-submit { grid-column: 1 / -1; width: 100%; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(25, 34, 28, .42); }
 .modal { width: min(100%, 460px); box-shadow: 0 18px 50px rgba(25, 34, 28, .2); }
-.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.modal-actions { display: grid; gap: 8px; margin-top: 8px; }
+.modal-error { margin: 0 0 16px; padding: 12px; border: 1px solid #e6b8b4; color: #a33d37; background: #fff7f6; font-size: .85rem; }
+.password-input { position: relative; display: flex; align-items: center; }
+.password-input input { padding-right: 92px; }
+.visibility-button { position: absolute; right: 6px; min-height: 32px; padding: 0 8px; border: 0; color: var(--accent); background: transparent; font-size: .75rem; }
+.visibility-button:hover { color: var(--accent-dark); background: transparent; }
 .profile-sections { display: grid; gap: 18px; }
 .section-heading { display: flex; justify-content: space-between; align-items: start; gap: 24px; }
 .section-heading h2 { margin-bottom: 8px; }
@@ -68,4 +75,4 @@ button:hover { background: var(--accent-dark); }
 .inline-form { display: flex; gap: 10px; }
 .success-box { margin: 18px 0 0; padding: 14px; color: var(--accent-dark); background: #edf5ee; border: 1px solid #c9dfcc; }
 button:disabled { cursor: not-allowed; opacity: .5; }
-@media (max-width: 760px) { .site-header { padding: 0 18px; } nav { gap: 12px; font-size: .78rem; } .auth-page { grid-template-columns: 1fr; gap: 42px; padding-top: 58px; } .auth-panel { max-width: 450px; } .form-page, .dashboard { padding: 58px 18px; } .form-grid { grid-template-columns: 1fr; } .span-two { grid-column: auto; } .dashboard-top { display: block; } .dashboard-top .secondary-button { margin-top: 18px; } .management-heading, .record-card { display: block; } .type-filter { display: grid; margin-top: 18px; } .record-actions { margin-top: 18px; } }
+@media (max-width: 760px) { .site-header { padding: 0 18px; } nav { gap: 12px; font-size: .78rem; } .auth-page { grid-template-columns: 1fr; gap: 42px; padding-top: 58px; } .auth-panel { max-width: 450px; } .form-page, .dashboard { padding: 58px 18px; } .form-grid { grid-template-columns: 1fr; } .span-two { grid-column: auto; } .dashboard-top { display: block; } .dashboard-top .secondary-button { margin-top: 18px; } .management-heading, .record-card, .password-card { display: block; } .type-filter { display: grid; margin-top: 18px; } .record-actions { margin-top: 18px; } .password-card button { width: 100%; margin-top: 18px; } }
