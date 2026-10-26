@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { apiOrigin, apiRequest, errorText } from "../../lib/api";
 import { Field } from "./Field";
 import { PasswordDialog } from "./PasswordDialog";
@@ -13,6 +13,7 @@ export function CompanyPanel({ user, notify }: { user: User; notify: Notify }) {
   const [code, setCode] = useState("");
   const [checked, setChecked] = useState<Redemption | null>(null);
   const [busy, setBusy] = useState(true);
+  const advantageForm = useRef<HTMLElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -98,7 +99,7 @@ export function CompanyPanel({ user, notify }: { user: User; notify: Notify }) {
         </form>
       </section>
       <PasswordDialog notify={notify} />
-      <section className="panel">
+      <section className="panel" ref={advantageForm}>
         <h2>{editing ? "Editar vantagem" : "Nova vantagem"}</h2>
         <p className="muted">{editing ? "Envie uma nova foto apenas se quiser trocá-la." : "Descrição, custo em moedas e foto do produto."}</p>
         <form className="form-grid" key={editing?.id ?? "new"} onSubmit={saveAdvantage}>
@@ -123,7 +124,7 @@ export function CompanyPanel({ user, notify }: { user: User; notify: Notify }) {
                 </div>
               </div>
               <div className="record-actions">
-                <button type="button" className="secondary-button" onClick={() => setEditing(item)}>Editar</button>
+                <button type="button" className="secondary-button" onClick={() => { setEditing(item); advantageForm.current?.scrollIntoView({ behavior: "smooth" }); }}>Editar</button>
                 <button type="button" className="danger-button" onClick={() => void remove(item.id)}>Remover</button>
               </div>
             </article>
