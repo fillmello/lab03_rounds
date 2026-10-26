@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
 function getErrorMessage(body: unknown): string {
   if (typeof body === "string") return body;
@@ -23,6 +23,7 @@ function getErrorMessage(body: unknown): string {
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     headers: { "Content-Type": "application/json", ...options.headers },
+    credentials: "include",
     ...options,
   });
   const body = await response.json();

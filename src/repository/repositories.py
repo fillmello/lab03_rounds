@@ -22,3 +22,28 @@ def cpf_in_use(db: Session, cpf: str) -> bool:
 
 def cnpj_in_use(db: Session, cnpj: str) -> bool:
     return db.scalar(select(EmpresaParceira.id).where(EmpresaParceira.cnpj == cnpj)) is not None
+
+
+def email_or_login_in_use_for_other(
+    db: Session, email: str, login: str, user_id: int
+) -> bool:
+    return db.scalar(
+        select(Usuario.id).where(
+            Usuario.id != user_id,
+            ((Usuario.email == email) | (Usuario.login == login)),
+        )
+    ) is not None
+
+
+def cpf_in_use_for_other(db: Session, cpf: str, student_id: int) -> bool:
+    return db.scalar(
+        select(Aluno.id).where(Aluno.cpf == cpf, Aluno.id != student_id)
+    ) is not None
+
+
+def cnpj_in_use_for_other(db: Session, cnpj: str, company_id: int) -> bool:
+    return db.scalar(
+        select(EmpresaParceira.id).where(
+            EmpresaParceira.cnpj == cnpj, EmpresaParceira.id != company_id
+        )
+    ) is not None
