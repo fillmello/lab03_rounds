@@ -13,10 +13,11 @@ entity USUARIO {
   email : VARCHAR(254) <<UK>>
   login : VARCHAR(150) <<UK>>
   senha_hash : VARCHAR(128)
+  tipo : VARCHAR(30)
 }
 
 entity ALUNO {
-  * usuario_id : BIGINT <<PK, FK>>
+  * id : BIGINT <<PK, FK>>
   --
   cpf : VARCHAR(11) <<UK>>
   rg : VARCHAR(20)
@@ -27,16 +28,17 @@ entity ALUNO {
 }
 
 entity PROFESSOR {
-  * usuario_id : BIGINT <<PK, FK>>
+  * id : BIGINT <<PK, FK>>
   --
   cpf : VARCHAR(11) <<UK>>
   departamento : VARCHAR(120)
   saldo : INTEGER
+  ultimo_credito_semestre : VARCHAR(7)
   instituicao_id : BIGINT <<FK>>
 }
 
 entity EMPRESA_PARCEIRA {
-  * usuario_id : BIGINT <<PK, FK>>
+  * id : BIGINT <<PK, FK>>
   --
   cnpj : VARCHAR(14) <<UK>>
 }

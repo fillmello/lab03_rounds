@@ -26,10 +26,10 @@
 
 ## 🚧 Status do Projeto
 
-🟢 **Sprint 01 concluída** — Modelagem da Release 1 entregue.
+🟢 **Release 1 funcional (Sprint 03)** — modelagem, persistência, CRUDs e fluxo completo de moedas implementados.
 
 [![Versão](https://img.shields.io/badge/Versão-v0.1.0-blue)](https://github.com/fillmello/lab03_rounds/releases)
-[![Sprint](https://img.shields.io/badge/Sprint-Lab03S01-orange)](docs/sprints/lab03s01.md)
+[![Sprint](https://img.shields.io/badge/Sprint-Lab03S03-orange)](docs/sprints/lab03s01.md)
 [![Modelagem](https://img.shields.io/badge/Modelagem-PlantUML-green)](docs/diagramas)
 [![Arquitetura](https://img.shields.io/badge/Arquitetura-MVC-blueviolet)](#-arquitetura)
 [![Licença](https://img.shields.io/github/license/fillmello/lab03_rounds)](#-licença)
@@ -52,18 +52,9 @@
 - [Instalação e Execução](#-instalação-e-execução)
   - [Pré-requisitos](#pré-requisitos)
   - [Variáveis de Ambiente](#-variáveis-de-ambiente)
-     - [1 Back-end](#1-back-end)
-     - [2 Front-end](#2-front-end)
-     - [3 Exemplos de Variáveis de Ambiente em Provedores de Deploy](#3-exemplos-de-variáveis-de-ambiente-em-provedores-de-deploy)
   - [Instalação de Dependências](#-instalação-de-dependências)
-    - [Front-end](#front-end)
-    - [Back-end](#back-end)
-  - [Inicialização do Banco de Dados](#-inicialização-do-banco-de-dados)
   - [Como Executar a Aplicação](#-como-executar-a-aplicação)
-    - [Terminal 1: Back-end](#terminal-1-back-end)
-    - [Terminal 2: Front-end](#terminal-2-front-end)
-    - [Execução Local Completa com Docker Compose (Incluindo Banco de Dados)](#-execução-local-completa-com-docker-compose-incluindo-banco-de-dados)
-    - [Passos para build, inicialização e execução](#-passos-para-build-inicialização-e-execução)
+  - [Acessos de demonstração](#-acessos-de-demonstração)
 - [Deploy](#-deploy)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Demonstração](#-demonstração)
@@ -88,7 +79,7 @@
 * 📱 **Download Mobile:** _Não se aplica na Release 1 (aplicação web)._
   > 📱 **Descrição:** Se o grupo criar um app, inclua aqui os links da App Store, Google Play ou APK direto.
 * 📖 **Documentação:** [`docs/`](docs/)
-  > 📚 **Descrição:** [Requisitos e regras de negócio](docs/requisitos.md) · [Histórias do Usuário](docs/historias-de-usuario.md) · [Diagramas UML](docs/diagramas/) · [Guia da Sprint Lab03S01](docs/sprints/lab03s01.md)
+  > 📚 **Descrição:** [Arquitetura e tecnologias (tutorial)](docs/tutorial_arquitetura.md) · [Requisitos e regras de negócio](docs/requisitos.md) · [Histórias do Usuário](docs/historias-de-usuario.md) · [Diagramas UML](docs/diagramas/) · [Guia da Sprint Lab03S01](docs/sprints/lab03s01.md)
 
 ---
 
@@ -125,8 +116,8 @@
 | Sprint | Pontos | Entregas | Status |
 |--------|--------|----------|--------|
 | **Lab03S01** | 6 | Casos de Uso, Histórias do Usuário, Diagrama de Classes, Diagrama de Componentes | ✅ Concluída |
-| **Lab03S02** | 7 | Modelo ER, estratégia de acesso a dados (ORM/DAO), CRUD inicial de aluno e empresa parceira | 🟡 Em andamento |
-| **Lab03S03** | 7 | CRUD final, apresentação da arquitetura e persistência, tutorial das tecnologias (~20 min) | ⚪ Pendente |
+| **Lab03S02** | 7 | Modelo ER, estratégia de acesso a dados (ORM/DAO), CRUD inicial de aluno e empresa parceira | ✅ Concluída |
+| **Lab03S03** | 7 | CRUD final, apresentação da arquitetura e persistência, tutorial das tecnologias (~20 min) | ✅ Concluída ([tutorial](docs/tutorial_arquitetura.md)) |
 
 ---
 
@@ -145,11 +136,11 @@
 
 ## 🛠 Tecnologias Utilizadas
 
-Stack definida para a Sprint 2: **Next.js**, **React**, **TypeScript**, **Python 3.12**, **FastAPI**, **SQLAlchemy** e **Alembic**. O desenvolvimento usará SQLite; a configuração de produção poderá utilizar PostgreSQL.
+Next.js + React + TypeScript no front-end; Python 3.12 + FastAPI + SQLAlchemy no back-end. SQLite no desenvolvimento e PostgreSQL em produção.
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** Next.js e React
+* **Framework/Biblioteca:** Next.js 15 e React 19
 * **Linguagem:** TypeScript
 * **Estilização:** CSS
 * **Gerenciamento de Estado:** Estado local dos componentes React
@@ -160,10 +151,10 @@ Stack definida para a Sprint 2: **Next.js**, **React**, **TypeScript**, **Python
 * **Linguagem/Runtime:** Python 3.12
 * **Framework:** FastAPI
 * **Banco de Dados:** SQLite no desenvolvimento; PostgreSQL em produção
-* **ORM / Query Builder:** SQLAlchemy 2
-* **Migrações:** Alembic
-* **Autenticação:** OAuth2/JWT com utilitários do FastAPI
-* **E-mail:** SMTP com `smtplib`
+* **ORM:** SQLAlchemy 2 (tabelas criadas com `create_all`; sem migrations nesta release)
+* **Autenticação:** cookie de sessão HttpOnly assinado (HMAC) com expiração; senhas com PBKDF2-HMAC-SHA256 e salt
+* **E-mail:** SMTP com `smtplib` (Mailtrap no desenvolvimento; sem SMTP configurado, o e-mail vai para o log)
+* **Testes:** pytest
 
 ### 📱 Mobile (Opcional)
 
@@ -186,20 +177,21 @@ Stack definida para a Sprint 2: **Next.js**, **React**, **TypeScript**, **Python
 
 ## 🏗 Arquitetura
 
-O sistema segue o padrão **MVC (Model-View-Controller)**, organizado em FastAPI com camadas de Controller, Service, Model, Repository e View. A interface web usa templates Jinja2, HTML, CSS e JavaScript e consome a API por `fetch`. As regras de negócio ficam na camada de serviços, enquanto SQLAlchemy e Alembic cuidam do mapeamento e da persistência no banco de dados.
+O sistema segue o padrão **MVC (Model-View-Controller)**. A API FastAPI organiza o back-end em Controller, Service, Repository e Model; a View é o front-end Next.js, que consome a API por `fetch`. As regras de negócio ficam nos serviços e o acesso a dados em repositórios SQLAlchemy.
 
 - **Model:** entidades de domínio (`Usuario`, `Aluno`, `Professor`, `EmpresaParceira`, `InstituicaoEnsino`, `Vantagem`, `Transacao`, `EnvioMoeda`, `TrocaVantagem`).
 - **View:** telas de login, cadastro, envio de moedas, extrato, catálogo de vantagens e troca.
 - **Controller:** recebe as requisições e orquestra os casos de uso.
 - **Service:** regras de saldo, crédito semestral, geração do código do cupom e notificações.
-- **Repository:** interfaces e consultas implementadas com SQLAlchemy.
+- **Repository:** consultas implementadas com SQLAlchemy (`src/repository`).
 
 **Estratégia de persistência (Sprint 2)**
 - O grupo adotou o **SQLAlchemy 2 ORM** para mapear Models para tabelas relacionais; não será utilizado DAO manual.
-- As alterações de estrutura serão controladas por migrations do **Alembic**.
+- As tabelas são criadas por `Base.metadata.create_all` ao iniciar a aplicação; migrations (Alembic) ficam como evolução.
 - A herança de `Usuario` será mapeada com uma tabela base `USUARIO` e tabelas `ALUNO`, `PROFESSOR` e `EMPRESA_PARCEIRA` ligadas por chave primária compartilhada.
 - `Transacao` é abstrata no domínio; no banco, `ENVIO_MOEDA` e `TROCA_VANTAGEM` terão suas próprias tabelas.
-- O saldo será armazenado nas tabelas de aluno e professor e atualizado junto com as transações por regras da camada de serviço.
+- O saldo é armazenado nas tabelas de aluno e professor e atualizado junto com cada transação pela camada de serviço.
+- Professores são pré-cadastrados pela área administrativa (`/admin`, protegida por `ADMIN_TOKEN`), individualmente ou por lista enviada pela instituição.
 
 **Decisões arquiteturais importantes**
 - `Transacao` é **abstrata**, com as especializações `EnvioMoeda` (professor → aluno, com motivo) e `TrocaVantagem` (aluno → vantagem, com código), pois têm participantes e regras diferentes.
@@ -240,200 +232,79 @@ Histórias do Usuário: [`docs/historias-de-usuario.md`](docs/historias-de-usuar
 
 ## 🔧 Instalação e Execução
 
-> 🚧 _Seção a ser preenchida a partir da Sprint 02, quando houver código executável. Abaixo, o esqueleto do template para adaptar à stack escolhida._
-
 ### Pré-requisitos
-Certifique-se de que o usuário tenha o ambiente configurado.
 
-* **Linguagem/Runtime:** Python 3.12+
-* **Gerenciador de Pacotes / Build:** pip
-* **Banco de Dados:** SQLite (desenvolvimento) ou PostgreSQL (produção)
-* **Docker** (Opcional, mas **altamente recomendado** para rodar o Banco de Dados)
+* **Python** 3.12+ e **pip**
+* **Node.js** 20+ e **npm**
+* **Banco de Dados:** SQLite (já embutido; não exige instalação). PostgreSQL é opcional via `DATABASE_URL`.
 
 ---
 
 ### 🔑 Variáveis de Ambiente
 
-Crie arquivos `.env` específicos e/ou configure as variáveis de ambiente no seu sistema para cada parte da aplicação. **Nunca versione segredos**; mantenha um `.env.example` sem valores sensíveis.
+Copie [`.env.example`](.env.example) para `.env` na raiz e ajuste. **Nunca versione o `.env`.**
 
-#### 1 Back-end
-
-| Variável | Descrição | Exemplo |
+| Variável | Descrição | Padrão |
 | :--- | :--- | :--- |
-| `SERVER_PORT` | Porta do back-end. | `8000` |
-| `DATABASE_URL` | URL de conexão do SQLAlchemy. | `sqlite:///./moeda_estudantil.db` |
-| `JWT_SECRET` | Segredo para assinatura de tokens (se aplicável). | `chave_super_segura_base64` |
-| `MAIL_HOST` | Servidor SMTP para envio de e-mails. | `smtp.gmail.com` |
-| `MAIL_PORT` | Porta SMTP. | `587` |
-| `MAIL_USER` | Usuário/conta de e-mail remetente. | `noreply@exemplo.com` |
-| `MAIL_PASSWORD` | Senha/app password do e-mail. | `sua_senha_aqui` |
+| `DATABASE_URL` | URL do SQLAlchemy | `sqlite:///./moeda_estudantil.db` |
+| `SESSION_SECRET` | Segredo que assina o cookie de sessão (troque fora do desenvolvimento) | valor de desenvolvimento |
+| `COOKIE_SECURE` | `true` para exigir HTTPS no cookie | `false` |
+| `CORS_ORIGINS` | Origens do front, separadas por vírgula | `http://localhost:3000,http://127.0.0.1:3000` |
+| `ADMIN_TOKEN` | Libera a área `/admin` (vazio = desativada) | vazio |
+| `MAIL_HOST` / `MAIL_PORT` / `MAIL_USER` / `MAIL_PASSWORD` / `MAIL_FROM` | SMTP (ex.: Mailtrap). Sem `MAIL_HOST`, os e-mails só aparecem no log | vazio |
 
-#### 2 Front-end
-
-Crie um arquivo **`.env`** na raiz da pasta do front-end. Em projetos **Vite**, use o prefixo `VITE_` (ou `REACT_APP_` se estiver usando CRA) para expor as variáveis ao *bundle* da aplicação.
-
-| Variável | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `API_URL` | URL base da API consumida pelo front-end. | `http://localhost:8000/api` |
-
----
-
-#### 3 Exemplos de Variáveis de Ambiente em Provedores de Deploy
-
-> _Opcional. Preencha se o grupo fizer deploy (ex.: Vercel, Railway, Render)._
-
-Nos provedores, as variáveis são configuradas no painel do projeto (ex.: Vercel: Project Settings > Environment Variables).
-
-```
-# Back-end
-DATABASE_URL=postgresql+psycopg://<usuario>:<senha>@<host>:5432/moeda_estudantil
-MAIL_HOST=smtp.exemplo.com
-MAIL_PORT=587
-MAIL_USER=<email-remetente>
-MAIL_PASSWORD=<senha-ou-app-password>
-
-# Front-end
-VITE_API_URL=https://<url-do-backend>/api
-```
+Front-end (opcional): `NEXT_PUBLIC_API_URL` (padrão: mesmo host da página, porta 8000, ex.: `http://localhost:8000/api`).
 
 ---
 
 ### 📦 Instalação de Dependências
 
-Clone o repositório e instale as dependências.
-
-1. **Clone o repositório:**
-
 ```bash
 git clone https://github.com/fillmello/lab03_rounds.git
 cd lab03_rounds
-```
 
-2. **Instale as dependências do FastAPI:**
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate  # macOS/Linux
+# Back-end
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
+
+# Front-end
+cd frontend && npm install
 ```
-
----
-
-### 💾 Inicialização do Banco de Dados
-
-_Exemplo com PostgreSQL via Docker:_
-
-1. **Rode o Container do banco de dados:**
-
-```bash
-docker run --name moeda_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=senha-segura-123 -e POSTGRES_DB=moeda_estudantil -p 5432:5432 -d postgres:16
-```
-
-2. **Execute as migrações:**
-
-```bash
-alembic upgrade head
-```
-
-> No desenvolvimento, a aplicação cria as tabelas automaticamente ao iniciar. As migrações Alembic controlam a estrutura do banco em ambientes persistentes.
-
-3. **Carga inicial:** ao iniciar, a aplicação cria automaticamente instituições pré-cadastradas para uso no formulário de aluno. Os professores podem ser incluídos por seed conforme a lista enviada pela instituição.
 
 ---
 
 ### ⚡ Como Executar a Aplicação
-Execute o back-end e o front-end em terminais separados.
+
+Em dois terminais:
 
 ```bash
-source .venv/bin/activate  # macOS/Linux
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+# Terminal 1 (raiz): API
+uvicorn src.main:app --reload --port 8000
+
+# Terminal 2: front-end
+cd frontend && npm run dev
 ```
 
-Em outro terminal:
+🚀 *API em **http://localhost:8000** (documentação interativa em `/docs`) e front-end em **http://localhost:3000**.*
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-🚀 *A API estará disponível em **http://localhost:8000** e o front-end em **http://localhost:3000**.*
+Ao iniciar, a aplicação cria as tabelas, três instituições de exemplo e um professor de demonstração.
 
 ---
 
-#### 🐳 Execução Local Completa com Docker Compose (Incluindo Banco de Dados)
+### 👤 Acessos de demonstração
 
-> _Opcional. Preencha se o grupo adotar Docker Compose._
-
-Antes de tudo, certifique-se de que o **Docker Desktop** (Mac/Windows) ou o **serviço Docker** (Linux) está em execução.
-
-```bash
-sudo systemctl start docker   # Linux
-```
-
----
-
-#### 📦 Passos para build, inicialização e execução
-
-1. Acesse a pasta raiz do projeto (onde está o `docker-compose.yml`):
-
-```bash
-cd /caminho/do/projeto/sistema-moeda-estudantil
-```
-
-2. Suba todos os serviços definidos no `docker-compose.yml`:
-
-```bash
-docker-compose up --build -d
-```
-
-> [!NOTE]
-> 💡 O parâmetro `--build` garante que as imagens mais recentes do projeto sejam geradas, e `-d` executa em segundo plano.
-
-3. Verifique se os containers estão rodando:
-
-```bash
-docker ps
-```
-
-4. **Migrações do banco:** confirme nos logs do back-end que o schema foi criado.
-
-```bash
-docker logs <nome_do_container_backend>
-```
-
-5. Abra no navegador a porta configurada no `docker-compose` (Ex.: <http://localhost:3000> ou <http://localhost:5173>).
-
-6. Para parar e remover os containers e redes:
-
-```bash
-docker-compose down
-```
+| Perfil | Como entrar |
+| :--- | :--- |
+| Professor | login `professor` / senha `professor123` (apenas para desenvolvimento) |
+| Aluno e empresa parceira | auto-cadastro em `/cadastro/aluno` e `/cadastro/empresa` |
+| Administração | `/admin` com o `ADMIN_TOKEN` do `.env`: cadastra instituições e professores |
 
 ---
 
 ## 🚀 Deploy
 
-_[Descrever build de produção, variáveis do ambiente e comando de execução, caso o grupo faça deploy.]_
-
-1. **Build do Projeto:**
-
-```bash
-# Instalação das dependências
-python -m pip install -r requirements.txt
-# Execução da API
-uvicorn src.main:app --host 0.0.0.0 --port 8000
-```
-
-2. **Configuração do Ambiente de Produção:** defina as variáveis de ambiente no provedor escolhido (e.g., Vercel, Railway, Heroku, DigitalOcean).
-
-> 🔑 **Variáveis Cruciais:** configure a conexão com o banco de dados (`DATABASE_URL`), o servidor de e-mail (`MAIL_*`) e o segredo de autenticação (`JWT_SECRET`).
-
-3. **Execução em Produção:**
-
-```bash
-uvicorn src.main:app --host 0.0.0.0 --port 8000
-```
+Não há deploy da Release 1. Para produção: `DATABASE_URL` (PostgreSQL), `SESSION_SECRET` forte, `COOKIE_SECURE=true`, `CORS_ORIGINS`, `MAIL_*` e `ADMIN_TOKEN`; API com `uvicorn src.main:app --host 0.0.0.0 --port 8000` e front com `npm run build && npm start`.
 
 ---
 
@@ -441,33 +312,29 @@ uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 ```
 .
-├── .gitignore                    # 🧹 Ignora arquivos não versionados (.env, builds, plantuml.jar...).
-├── README.md                     # 📘 Documentação principal do projeto.
-├── LICENSE                       # ⚖️ Licença do projeto (a adicionar).
+├── README.md
+├── .env.example                  # Variáveis de ambiente (sem segredos)
+├── requirements.txt              # Dependências do back-end
+├── requirements-dev.txt          # + pytest e httpx
 │
-├── /docs                         # 📚 Documentação e modelagem
-│   ├── requisitos.md             # 📋 Regras de negócio, requisitos e premissas.
-│   ├── historias-de-usuario.md   # 🧑‍💼 Histórias do Usuário + rastreabilidade com casos de uso.
-│   ├── /diagramas                # 🧩 Diagramas UML (PlantUML)
-│   │   ├── casos-de-uso.puml
-│   │   ├── diagrama-de-classes.puml
-│   │   ├── diagrama-de-componentes.puml
-│   │   ├── sequencia-enviar-moedas.puml
-│   │   ├── sequencia-trocar-vantagem.puml
-│   │   ├── README.md             # ℹ️ Como visualizar/gerar os diagramas.
-│   │   └── /img                  # 🖼️ Imagens geradas (PNG).
+├── /docs                         # Documentação e modelagem
+│   ├── tutorial_arquitetura.md   # Arquitetura, persistência e tecnologias
+│   ├── requisitos.md · historias-de-usuario.md
+│   ├── /diagramas                # PlantUML (.puml) e imagens (/img)
 │   └── /sprints
-│       └── lab03s01.md           # ✅ Checklist e roteiro de commits da sprint.
 │
-├── /scripts
-│   └── gerar-diagramas.sh        # 🛠️ Gera os PNGs dos diagramas PlantUML.
+├── /src                          # Back-end FastAPI (MVC)
+│   ├── main.py · settings.py · database.py
+│   ├── /model                    # Entidades SQLAlchemy (entities.py) e schemas Pydantic
+│   ├── /controller               # Rotas por recurso (auth, alunos, empresas, moedas, vantagens, admin)
+│   ├── /service                  # Regras de negócio (moedas, usuários, semestre, e-mail, fotos, auth)
+│   └── /repository               # Consultas SQLAlchemy
 │
-└── /src                          # 💻 Código-fonte (MVC) — a partir da Sprint 02
-    ├── /model                    # 🧬 Entidades de domínio.
-    ├── /view                     # 🎨 Telas / front-end.
-    ├── /controller               # 🎮 Controladores (requisições e casos de uso).
-    ├── /service                  # ⚙️ Regras de negócio (saldo, cupom, e-mail).
-    └── /repository               # 🗄️ Acesso a dados (DAO/ORM).
+├── /frontend                     # View: Next.js + TypeScript
+│   ├── /app                      # Páginas (login, cadastro, painel, admin)
+│   └── /components · /lib
+│
+└── /tests                        # pytest (senha, moedas/vantagens, CRUDs e admin)
 ```
 
 ---
@@ -505,23 +372,28 @@ Para melhor visualização, as telas principais estão organizadas lado a lado.
 #### 1. Demonstração da API (Exemplo com cURL)
 
 ```bash
-# Professor envia 50 moedas a um aluno
-curl -X POST 'http://localhost:8080/api/moedas/enviar' \
-     -H 'Authorization: Bearer <jwt-do-professor>' \
+# Login do professor (guarda o cookie de sessão)
+curl -c cookies.txt -X POST 'http://localhost:8000/api/login' \
      -H 'Content-Type: application/json' \
-     -d '{"alunoId": 12, "quantidade": 50, "motivo": "Excelente participação em aula"}'
+     -d '{"login": "professor", "senha": "professor123"}'
+
+# Envio de 50 moedas a um aluno
+curl -b cookies.txt -X POST 'http://localhost:8000/api/moedas/enviar' \
+     -H 'Content-Type: application/json' \
+     -d '{"aluno_id": 1, "quantidade": 50, "motivo": "Excelente participação em aula"}'
 ```
 
 **Saída Esperada:**
 ```json
 {
-  "id": 301,
-  "tipo": "ENVIO_MOEDA",
-  "professorId": 3,
-  "alunoId": 12,
+  "id": 1,
+  "data": "2026-10-26T13:00:00",
   "quantidade": 50,
   "motivo": "Excelente participação em aula",
-  "saldoProfessor": 950
+  "professor_id": 1,
+  "professor_nome": "Professor Institucional",
+  "aluno_id": 1,
+  "aluno_nome": "Maria Souza"
 }
 ```
 
@@ -529,25 +401,14 @@ curl -X POST 'http://localhost:8080/api/moedas/enviar' \
 
 ## 🧪 Testes
 
-> 🚧 _A preencher a partir da Sprint 02._
-
-### Testes Unitários e de Integração
-Para rodar os testes da unidade e integração:
-
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
 ```
-# _[comando de testes da stack escolhida]_
-```
-*Ferramenta utilizada: _[JUnit, Jest, Vitest, PyTest, ...]_*
 
-**Cenários prioritários:** envio com saldo insuficiente, envio sem motivo, crédito semestral acumulando saldo, troca com saldo insuficiente, geração de código único de cupom, autenticação inválida.
+*Ferramenta: pytest com `TestClient` do FastAPI e SQLite temporário.*
 
-### Testes End-to-End (E2E)
-Para rodar os testes de ponta a ponta (E2E):
-
-```
-# _[comando dos testes E2E, se houver]_
-```
-*Ferramenta utilizada: _[Cypress, Playwright, Selenium, ...]_*
+**Cobertura:** mudança de senha (sucesso, senha atual errada, confirmação, senha fraca, sessões antigas invalidadas, bloqueio por tentativas, hash legado), envio de moedas (saldo insuficiente, motivo obrigatório, outra instituição, e-mail ao aluno, crédito semestral acumulando), resgate (saldo insuficiente, código único, **mesmo código nos e-mails do aluno e do parceiro**, conferência), CRUDs de aluno e empresa (validações, duplicidade, acesso a dados de outro usuário, remoção com vínculos), upload de foto e área administrativa.
 
 ---
 
