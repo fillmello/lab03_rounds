@@ -147,6 +147,35 @@ class ProfessorResponse(BaseModel):
     saldo: int
 
 
+class ProfessorCreate(BaseModel):
+    nome: NonEmptyString = Field(max_length=120)
+    email: str = Field(min_length=3, max_length=254)
+    login: NonEmptyString = Field(max_length=150)
+    senha: NonEmptyString
+    cpf: str
+    departamento: NonEmptyString = Field(max_length=120)
+    instituicao_id: int
+
+    _validate_email = field_validator("email")(_email)
+    _validate_cpf = field_validator("cpf")(
+        lambda value: _digits(value, "CPF", 11)
+    )
+
+
+class ProfessorUpdate(BaseModel):
+    nome: NonEmptyString | None = Field(default=None, max_length=120)
+    email: str | None = Field(default=None, min_length=3, max_length=254)
+    login: NonEmptyString | None = Field(default=None, max_length=150)
+    cpf: str | None = None
+    departamento: NonEmptyString | None = Field(default=None, max_length=120)
+    instituicao_id: int | None = None
+
+    _validate_email = field_validator("email")(_email)
+    _validate_cpf = field_validator("cpf")(
+        lambda value: _digits(value, "CPF", 11)
+    )
+
+
 class EnvioMoedaCreate(BaseModel):
     aluno_id: int
     quantidade: int = Field(gt=0)
@@ -171,7 +200,6 @@ class ExtratoResponse(BaseModel):
 
 class VantagemCreate(BaseModel):
     descricao: NonEmptyString = Field(max_length=2000)
-    foto: NonEmptyString = Field(max_length=255)
     custo_em_moedas: int = Field(gt=0)
 
 

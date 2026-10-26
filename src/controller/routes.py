@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -20,7 +21,8 @@ from src.model.schemas import (
     LoginRequest,
     LoginResponse,
     EnvioMoedaCreate, EnvioMoedaResponse, ExtratoResponse, ProfessorResponse,
-    PasswordChange, ResgateResponse, TrocaResponse, VantagemCreate, VantagemResponse,
+    PasswordChange, ProfessorCreate, ProfessorUpdate, ResgateResponse, TrocaResponse, VantagemCreate,
+    VantagemResponse,
 )
 from src.repository.repositories import (
     cnpj_in_use,
@@ -356,6 +358,82 @@ def get_professor(professor_id: int, db: Session = Depends(get_db),
     professor = db.get(Professor, professor_id)
     if professor is None:
         raise HTTPException(status_code=404, detail="Professor não encontrado.")
+    return professor
+
+
+@router.post("/professores", response_model=ProfessorResponse, status_code=status.HTTP_201_CREATED)
+def create_professor(
+    payload: ProfessorCreate,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(current_user),
+) -> Professor:
+    require_type(user, EmpresaParceira)
+    if email_or_login_in_use(db, payload.email, payload.login) or cpf_in_use(db, payload.cpf):
+        raise HTTPException(status_code=409, detail="E-mail, login ou CPF já cadastrado.")
+    if find_institution(db, payload.instituicao_id) is None:
+        raise HTTPException(status_code=404, detail="Instituição não encontrada.")
+    semester = f"{datetime.utcnow().year}-{'1' if datetime.utcnow().month <= 6 else '2'}"
+    professor = Professor(
+        nome=payload.nome,
+        email=payload.email,
+        login=payload.login,
+        senha_hash=hash_password(payload.senha),
+        cpf=payload.cpf,
+        departamento=payload.departamento,
+        instituicao_id=payload.instituicao_id,
+        saldo=1000,
+        ultimo_credito_semestre=semester,
+    )
+    db.add(professor)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="E-mail, login ou CPF já cadastrado.") from exc
+    db.refresh(professor)
+    return professor
+
+
+@router.get("/professores", response_model=list[ProfessorResponse])
+def list_professors(
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(current_user),
+) -> list[Professor]:
+    require_type(user, EmpresaParceira)
+    return list(db.query(Professor).order_by(Professor.nome).all())
+
+
+@router.put("/professores/{professor_id}", response_model=ProfessorResponse)
+def update_professor(
+    professor_id: int,
+    payload: ProfessorUpdate,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(current_user),
+) -> Professor:
+    require_type(user, EmpresaParceira)
+    professor = db.get(Professor, professor_id)
+    if professor is None:
+        raise HTTPException(status_code=404, detail="Professor não encontrado.")
+    values = payload.model_dump(exclude_unset=True)
+    if not values:
+        return professor
+    if (
+        ("email" in values or "login" in values)
+        and email_or_login_in_use_for_other(
+            db, values.get("email", professor.email), values.get("login", professor.login), professor.id
+        )
+    ) or ("cpf" in values and cpf_in_use_for_other(db, values["cpf"], professor.id)):
+        raise HTTPException(status_code=409, detail="E-mail, login ou CPF já cadastrado.")
+    if "instituicao_id" in values and find_institution(db, values["instituicao_id"]) is None:
+        raise HTTPException(status_code=404, detail="Instituição não encontrada.")
+    for key, value in values.items():
+        setattr(professor, key, value)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Não foi possível atualizar o professor.") from exc
+    db.refresh(professor)
     return professor
 
 

@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.model.entities import Aluno, EmpresaParceira, InstituicaoEnsino, Usuario
+from src.model.entities import Aluno, EmpresaParceira, InstituicaoEnsino, Professor, Usuario
 
 
 def find_user_by_credentials(db: Session, login: str) -> Usuario | None:
@@ -17,7 +17,9 @@ def email_or_login_in_use(db: Session, email: str, login: str) -> bool:
 
 
 def cpf_in_use(db: Session, cpf: str) -> bool:
-    return db.scalar(select(Aluno.id).where(Aluno.cpf == cpf)) is not None
+    return db.scalar(select(Aluno.id).where(Aluno.cpf == cpf)) is not None or db.scalar(
+        select(Professor.id).where(Professor.cpf == cpf)
+    ) is not None
 
 
 def cnpj_in_use(db: Session, cnpj: str) -> bool:
@@ -36,9 +38,10 @@ def email_or_login_in_use_for_other(
 
 
 def cpf_in_use_for_other(db: Session, cpf: str, student_id: int) -> bool:
-    return db.scalar(
-        select(Aluno.id).where(Aluno.cpf == cpf, Aluno.id != student_id)
-    ) is not None
+    return (
+        db.scalar(select(Aluno.id).where(Aluno.cpf == cpf, Aluno.id != student_id)) is not None
+        or db.scalar(select(Professor.id).where(Professor.cpf == cpf, Professor.id != student_id)) is not None
+    )
 
 
 def cnpj_in_use_for_other(db: Session, cnpj: str, company_id: int) -> bool:

@@ -76,7 +76,8 @@ class Vantagem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     descricao: Mapped[str] = mapped_column(Text, nullable=False)
-    foto: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Mantido para compatibilidade com bancos criados em versões anteriores.
+    foto: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     custo_em_moedas: Mapped[int] = mapped_column(Integer, nullable=False)
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresa_parceira.id"), nullable=False)
 
