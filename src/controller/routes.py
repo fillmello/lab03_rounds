@@ -20,7 +20,7 @@ from src.model.schemas import (
     LoginRequest,
     LoginResponse,
     EnvioMoedaCreate, EnvioMoedaResponse, ExtratoResponse, ProfessorResponse,
-    ResgateResponse, TrocaResponse, VantagemCreate, VantagemResponse,
+    PasswordChange, ResgateResponse, TrocaResponse, VantagemCreate, VantagemResponse,
 )
 from src.repository.repositories import (
     cnpj_in_use,
@@ -143,6 +143,8 @@ def update_student(
     values = payload.model_dump(exclude_unset=True)
     if not values:
         return student
+    if "senha" in values:
+        raise HTTPException(status_code=400, detail="Use a opção 'Mudar senha' para alterar sua senha.")
     if (
         ("email" in values or "login" in values)
         and email_or_login_in_use_for_other(
@@ -249,6 +251,8 @@ def update_company(
     values = payload.model_dump(exclude_unset=True)
     if not values:
         return company
+    if "senha" in values:
+        raise HTTPException(status_code=400, detail="Use a opção 'Mudar senha' para alterar sua senha.")
     if (
         ("email" in values or "login" in values)
         and email_or_login_in_use_for_other(
@@ -315,6 +319,22 @@ def login(
 @router.get("/me", response_model=LoginResponse)
 def get_current_user(user: Usuario = Depends(current_user)) -> LoginResponse:
     return LoginResponse(id=user.id, nome=user.nome, tipo=user.tipo)
+
+
+@router.post("/me/senha", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(
+    payload: PasswordChange,
+    user: Usuario = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    if not password_matches(payload.senha_atual, user.senha_hash):
+        raise HTTPException(status_code=400, detail="A senha atual está incorreta.")
+    if payload.nova_senha != payload.confirmacao:
+        raise HTTPException(status_code=400, detail="A confirmação da nova senha não confere.")
+    if password_matches(payload.nova_senha, user.senha_hash):
+        raise HTTPException(status_code=400, detail="A nova senha deve ser diferente da atual.")
+    user.senha_hash = hash_password(payload.nova_senha)
+    db.commit()
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

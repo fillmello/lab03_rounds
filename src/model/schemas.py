@@ -129,6 +129,12 @@ class LoginResponse(BaseModel):
     tipo: str
 
 
+class PasswordChange(BaseModel):
+    senha_atual: NonEmptyString
+    nova_senha: NonEmptyString
+    confirmacao: NonEmptyString
+
+
 class ProfessorResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int

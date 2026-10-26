@@ -70,7 +70,8 @@ function StudentPanel({ user, notify }: { user: User; notify: (message: string, 
   if (busy || !student || !statement) return <p className="loading-state">Carregando seus dados…</p>;
   return <div className="profile-sections">
     <section className="panel"><div className="section-heading"><div><h2>Meu cadastro</h2><p className="muted">Mantenha seus dados atualizados.</p></div><strong className="balance">{statement.saldo} moedas</strong></div>
-      <form className="form-grid" onSubmit={update}><Field label="Nome" name="nome" defaultValue={student.nome}/><Field label="E-mail" name="email" type="email" defaultValue={student.email}/><Field label="Login" name="login" defaultValue={student.login}/><Field label="Curso" name="curso" defaultValue={student.curso}/><Field label="RG" name="rg" defaultValue={student.rg}/><Field label="Endereço" name="endereco" defaultValue={student.endereco} wide/><Field label="Nova senha (opcional)" name="senha" type="password"/><button type="submit">Salvar cadastro</button></form>
+      <form className="form-grid" onSubmit={update}><Field label="Nome" name="nome" defaultValue={student.nome}/><Field label="E-mail" name="email" type="email" defaultValue={student.email}/><Field label="Login" name="login" defaultValue={student.login}/><Field label="Curso" name="curso" defaultValue={student.curso}/><Field label="RG" name="rg" defaultValue={student.rg}/><Field label="Endereço" name="endereco" defaultValue={student.endereco} wide/>      <button type="submit" className="full-width-submit">Salvar cadastro</button></form>
+      <PasswordDialog notify={notify}/>
     </section>
     <section className="panel"><h2>Vantagens disponíveis</h2><p className="muted">Use suas moedas para resgatar benefícios.</p><div className="record-list">{advantages.map(item => <article className="record-card" key={item.id}><div><span className="record-id">Oferta #{item.id}</span><h3>{item.descricao}</h3><p>{item.custo_em_moedas} moedas · {item.foto}</p></div><button type="button" onClick={() => void redeem(item.id)} disabled={statement.saldo < item.custo_em_moedas}>Resgatar</button></article>)}{advantages.length === 0 && <p className="empty-state">Nenhuma vantagem disponível.</p>}</div></section>
     <StatementPanel statement={statement}/>
@@ -83,7 +84,7 @@ function ProfessorPanel({ user, notify }: { user: User; notify: (message: string
   useEffect(() => { void load(); }, [load]);
   async function send(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const data = Object.fromEntries(new FormData(event.currentTarget)); try { await apiRequest("/moedas/enviar", { method: "POST", body: JSON.stringify({ aluno_id: Number(data.aluno_id), quantidade: Number(data.quantidade), motivo: data.motivo }) }); notify("Moedas enviadas com sucesso."); event.currentTarget.reset(); await load(); } catch (reason) { notify(reason instanceof Error ? reason.message : "Não foi possível enviar moedas.", true); } }
   if (busy || !professor || !statement) return <p className="loading-state">Carregando seus dados…</p>;
-  return <div className="profile-sections"><section className="panel"><div className="section-heading"><div><h2>Saldo do professor</h2><p className="muted">Reconheça um aluno da sua instituição.</p></div><strong className="balance">{statement.saldo} moedas</strong></div><form className="form-grid" onSubmit={send}><Field label="ID do aluno" name="aluno_id" type="number"/><Field label="Quantidade" name="quantidade" type="number"/><Field label="Motivo" name="motivo" wide/><button type="submit">Enviar moedas</button></form></section><StatementPanel statement={statement} outgoing/></div>;
+  return <div className="profile-sections"><section className="panel"><div className="section-heading"><div><h2>Saldo do professor</h2><p className="muted">Reconheça um aluno da sua instituição.</p></div><strong className="balance">{statement.saldo} moedas</strong></div><form className="form-grid" onSubmit={send}><Field label="ID do aluno" name="aluno_id" type="number"/><Field label="Quantidade" name="quantidade" type="number"/><Field label="Motivo" name="motivo" wide/><button type="submit">Enviar moedas</button></form></section><PasswordDialog notify={notify}/><StatementPanel statement={statement} outgoing/></div>;
 }
 
 function CompanyPanel({ user, notify }: { user: User; notify: (message: string, error?: boolean) => void }) {
@@ -95,11 +96,62 @@ function CompanyPanel({ user, notify }: { user: User; notify: (message: string, 
   async function remove(id: number) { if (!window.confirm("Remover esta vantagem?")) return; try { await apiRequest(`/vantagens/${id}`, { method: "DELETE" }); notify("Vantagem removida."); await load(); } catch (reason) { notify(reason instanceof Error ? reason.message : "Não foi possível remover a vantagem.", true); } }
   async function check(event: FormEvent) { event.preventDefault(); try { setChecked(await apiRequest<{ codigo: string; quantidade: number; aluno_id: number }>(`/trocas/${encodeURIComponent(code.trim())}`)); notify("Código conferido."); } catch (reason) { setChecked(null); notify(reason instanceof Error ? reason.message : "Código não encontrado.", true); } }
   if (busy || !company) return <p className="loading-state">Carregando seus dados…</p>;
-  return <div className="profile-sections"><section className="panel"><h2>Meu cadastro</h2><p className="muted">Atualize os dados da empresa parceira.</p><form className="form-grid" onSubmit={updateCompany}><Field label="Nome" name="nome" defaultValue={company.nome}/><Field label="E-mail" name="email" type="email" defaultValue={company.email}/><Field label="Login" name="login" defaultValue={company.login}/><Field label="CNPJ" name="cnpj" defaultValue={company.cnpj}/><Field label="Nova senha (opcional)" name="senha" type="password"/><button type="submit">Salvar cadastro</button></form></section><section className="panel"><h2>{editing ? "Editar vantagem" : "Nova vantagem"}</h2><form className="form-grid" onSubmit={saveAdvantage}><Field label="Descrição" name="descricao" defaultValue={editing?.descricao} wide/><Field label="Foto (URL ou referência)" name="foto" defaultValue={editing?.foto}/><Field label="Custo em moedas" name="custo_em_moedas" type="number" defaultValue={editing?.custo_em_moedas}/><button type="submit">{editing ? "Salvar alteração" : "Criar vantagem"}</button>{editing && <button type="button" className="secondary-button" onClick={() => setEditing(null)}>Cancelar</button>}</form></section><section className="panel"><h2>Minhas vantagens</h2><div className="record-list">{advantages.map(item => <article className="record-card" key={item.id}><div><span className="record-id">Oferta #{item.id}</span><h3>{item.descricao}</h3><p>{item.custo_em_moedas} moedas · {item.foto}</p></div><div className="record-actions"><button type="button" className="secondary-button" onClick={() => setEditing(item)}>Editar</button><button type="button" className="danger-button" onClick={() => void remove(item.id)}>Remover</button></div></article>)}{advantages.length === 0 && <p className="empty-state">Você ainda não cadastrou vantagens.</p>}</div></section><section className="panel"><h2>Conferir código de troca</h2><form className="inline-form" onSubmit={check}><input aria-label="Código de troca" value={code} onChange={event => setCode(event.target.value)} placeholder="Cole o código do aluno" required/><button type="submit">Conferir</button></form>{checked && <p className="success-box">Código válido: {checked.quantidade} moedas · aluno #{checked.aluno_id}.</p>}</section></div>;
+  return <div className="profile-sections"><section className="panel"><h2>Meu cadastro</h2><p className="muted">Atualize os dados da empresa parceira.</p><form className="form-grid" onSubmit={updateCompany}><Field label="Nome" name="nome" defaultValue={company.nome}/><Field label="E-mail" name="email" type="email" defaultValue={company.email}/><Field label="Login" name="login" defaultValue={company.login}/><Field label="CNPJ" name="cnpj" defaultValue={company.cnpj}/>  <button type="submit" className="full-width-submit">Salvar cadastro</button></form></section><PasswordDialog notify={notify}/><section className="panel"><h2>{editing ? "Editar vantagem" : "Nova vantagem"}</h2><form className="form-grid" onSubmit={saveAdvantage}><Field label="Descrição" name="descricao" defaultValue={editing?.descricao} wide/><Field label="Foto (URL ou referência)" name="foto" defaultValue={editing?.foto}/><Field label="Custo em moedas" name="custo_em_moedas" type="number" defaultValue={editing?.custo_em_moedas}/><button type="submit">{editing ? "Salvar alteração" : "Criar vantagem"}</button>{editing && <button type="button" className="secondary-button" onClick={() => setEditing(null)}>Cancelar</button>}</form></section><section className="panel"><h2>Minhas vantagens</h2><div className="record-list">{advantages.map(item => <article className="record-card" key={item.id}><div><span className="record-id">Oferta #{item.id}</span><h3>{item.descricao}</h3><p>{item.custo_em_moedas} moedas · {item.foto}</p></div><div className="record-actions"><button type="button" className="secondary-button" onClick={() => setEditing(item)}>Editar</button><button type="button" className="danger-button" onClick={() => void remove(item.id)}>Remover</button></div></article>)}{advantages.length === 0 && <p className="empty-state">Você ainda não cadastrou vantagens.</p>}</div></section><section className="panel"><h2>Conferir código de troca</h2><form className="inline-form" onSubmit={check}><input aria-label="Código de troca" value={code} onChange={event => setCode(event.target.value)} placeholder="Cole o código do aluno" required/><button type="submit">Conferir</button></form>{checked && <p className="success-box">Código válido: {checked.quantidade} moedas · aluno #{checked.aluno_id}.</p>}</section></div>;
 }
 
 function StatementPanel({ statement, outgoing = false }: { statement: Statement; outgoing?: boolean }) {
   return <section className="panel"><div className="section-heading"><div><h2>Extrato</h2><p className="muted">Movimentações recentes.</p></div><strong className="balance">{statement.saldo} moedas</strong></div><div className="statement-list">{statement.envios.map(item => <div className="statement-row" key={`e-${item.id}`}><span>Envio para aluno #{item.aluno_id}<small>{item.motivo}</small></span><strong>{outgoing ? "-" : "+"}{item.quantidade}</strong></div>)}{statement.trocas.map(item => <div className="statement-row" key={`t-${item.id}`}><span>Resgate #{item.vantagem_id}<small>{item.codigo}</small></span><strong>-{item.quantidade}</strong></div>)}{statement.envios.length + statement.trocas.length === 0 && <p className="empty-state">Nenhuma movimentação ainda.</p>}</div></section>;
+}
+
+function PasswordDialog({ notify }: { notify: (message: string, error?: boolean) => void }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = Object.fromEntries(new FormData(event.currentTarget));
+    setBusy(true);
+    try {
+      await apiRequest("/me/senha", {
+        method: "POST",
+        body: JSON.stringify({
+          senha_atual: form.senha_atual,
+          nova_senha: form.nova_senha,
+          confirmacao: form.confirmacao,
+        }),
+      });
+      notify("Senha alterada com sucesso.");
+      setOpen(false);
+      event.currentTarget.reset();
+    } catch (reason) {
+      notify(reason instanceof Error ? reason.message : "Não foi possível alterar a senha.", true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <>
+    <button type="button" className="secondary-button password-button" onClick={() => setOpen(true)}>
+      Mudar senha
+    </button>
+    {open && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
+      if (event.target === event.currentTarget) setOpen(false);
+    }}>
+      <section className="modal panel" role="dialog" aria-modal="true" aria-labelledby="password-title">
+        <h2 id="password-title">Mudar senha</h2>
+        <p className="muted">Confirme sua senha atual para definir uma nova.</p>
+        <form className="form-stack" onSubmit={submit}>
+          <Field label="Senha atual" name="senha_atual" type="password" />
+          <Field label="Nova senha" name="nova_senha" type="password" />
+          <Field label="Confirmar nova senha" name="confirmacao" type="password" />
+          <div className="modal-actions">
+            <button type="submit" disabled={busy}>{busy ? "Salvando..." : "Salvar nova senha"}</button>
+            <button type="button" className="secondary-button" onClick={() => setOpen(false)}>Cancelar</button>
+          </div>
+        </form>
+      </section>
+    </div>}
+  </>;
 }
 
 function Field({ label, name, type = "text", defaultValue, wide = false }: { label: string; name: string; type?: string; defaultValue?: string | number; wide?: boolean }) {
