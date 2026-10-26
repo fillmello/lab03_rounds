@@ -10,3 +10,5 @@ frontend/.next/
 uploads/
 .pytest_cache/
 frontend/tsconfig.tsbuildinfo
+.api.log
+.web.log

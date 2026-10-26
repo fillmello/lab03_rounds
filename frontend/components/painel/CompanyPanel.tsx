@@ -105,8 +105,8 @@ export function CompanyPanel({ user, notify }: { user: User; notify: Notify }) {
           <Field label="Descrição" name="descricao" defaultValue={editing?.descricao} maxLength={2000} wide />
           <Field label="Custo em moedas" name="custo_em_moedas" type="number" min={1} step={1} defaultValue={editing?.custo_em_moedas} />
           <Field label="Foto (JPG ou PNG, até 2 MB)" name="foto" type="file" accept="image/png,image/jpeg" required={!editing} />
-          <button type="submit">{editing ? "Salvar alteração" : "Criar vantagem"}</button>
-          {editing && <button type="button" className="secondary-button" onClick={() => setEditing(null)}>Cancelar</button>}
+          <button type="submit" className="full-width-submit">{editing ? "Salvar alteração" : "Criar vantagem"}</button>
+          {editing && <button type="button" className="secondary-button full-width-submit" onClick={() => setEditing(null)}>Cancelar</button>}
         </form>
       </section>
       <section className="panel">
