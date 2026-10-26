@@ -14,11 +14,11 @@ export default function LoginPage() {
     setError(false);
     const form = new FormData(event.currentTarget);
     try {
-      const user = await apiRequest<{ nome: string; tipo: string }>("/login", {
+      await apiRequest("/login", {
         method: "POST",
         body: JSON.stringify({ login: form.get("login"), senha: form.get("senha") }),
       });
-      window.location.href = `/painel?nome=${encodeURIComponent(user.nome)}&tipo=${user.tipo}`;
+      window.location.href = "/painel";
     } catch (reason) {
       setError(true);
       setMessage(reason instanceof Error ? reason.message : "Não foi possível entrar.");

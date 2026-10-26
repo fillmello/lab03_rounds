@@ -1,9 +1,13 @@
+import secrets
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.database import get_db
-from src.model.entities import Aluno, EmpresaParceira, InstituicaoEnsino, Usuario
+from src.model.entities import (
+    Aluno, EmpresaParceira, EnvioMoeda, InstituicaoEnsino, Professor, TrocaVantagem,
+    Usuario, Vantagem,
+)
 from src.model.schemas import (
     AlunoCreate,
     AlunoResponse,
@@ -15,6 +19,8 @@ from src.model.schemas import (
     InstituicaoResponse,
     LoginRequest,
     LoginResponse,
+    EnvioMoedaCreate, EnvioMoedaResponse, ExtratoResponse, ProfessorResponse,
+    ResgateResponse, TrocaResponse, VantagemCreate, VantagemResponse,
 )
 from src.repository.repositories import (
     cnpj_in_use,
@@ -306,6 +312,168 @@ def login(
     return LoginResponse(id=user.id, nome=user.nome, tipo=user.tipo)
 
 
+@router.get("/me", response_model=LoginResponse)
+def get_current_user(user: Usuario = Depends(current_user)) -> LoginResponse:
+    return LoginResponse(id=user.id, nome=user.nome, tipo=user.tipo)
+
+
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(response: Response) -> None:
     response.delete_cookie("session")
+
+
+def require_type(user: Usuario, expected: type) -> None:
+    if not isinstance(user, expected):
+        raise HTTPException(status_code=403, detail="Perfil sem permissão para esta operação.")
+
+
+@router.get("/professores/{professor_id}", response_model=ProfessorResponse)
+def get_professor(professor_id: int, db: Session = Depends(get_db),
+                  user: Usuario = Depends(current_user)) -> Professor:
+    require_type(user, Professor)
+    if user.id != professor_id:
+        raise HTTPException(status_code=403, detail="Você só pode consultar seu próprio perfil.")
+    professor = db.get(Professor, professor_id)
+    if professor is None:
+        raise HTTPException(status_code=404, detail="Professor não encontrado.")
+    return professor
+
+
+@router.post("/moedas/enviar", response_model=EnvioMoedaResponse, status_code=201)
+@router.post("/envios", response_model=EnvioMoedaResponse, status_code=201, include_in_schema=False)
+def send_coins(payload: EnvioMoedaCreate, db: Session = Depends(get_db),
+               user: Usuario = Depends(current_user)) -> EnvioMoeda:
+    require_type(user, Professor)
+    professor = db.get(Professor, user.id)
+    aluno = db.get(Aluno, payload.aluno_id)
+    if aluno is None:
+        raise HTTPException(status_code=404, detail="Aluno não encontrado.")
+    if professor.instituicao_id != aluno.instituicao_id:
+        raise HTTPException(status_code=403, detail="Professor e aluno devem pertencer à mesma instituição.")
+    if professor.saldo < payload.quantidade:
+        raise HTTPException(status_code=400, detail="Saldo insuficiente.")
+    professor.saldo -= payload.quantidade
+    aluno.saldo += payload.quantidade
+    envio = EnvioMoeda(quantidade=payload.quantidade, motivo=payload.motivo,
+                        professor_id=professor.id, aluno_id=aluno.id)
+    db.add(envio)
+    db.commit()
+    db.refresh(envio)
+    return envio
+
+
+@router.get("/extratos/professor", response_model=ExtratoResponse)
+@router.get("/extrato/professor", response_model=ExtratoResponse, include_in_schema=False)
+def professor_statement(db: Session = Depends(get_db),
+                        user: Usuario = Depends(current_user)) -> ExtratoResponse:
+    require_type(user, Professor)
+    professor = db.get(Professor, user.id)
+    envios = list(db.query(EnvioMoeda).filter_by(professor_id=user.id)
+                  .order_by(EnvioMoeda.data.desc()).all())
+    return ExtratoResponse(saldo=professor.saldo, envios=envios, trocas=[])
+
+
+@router.get("/extratos/aluno", response_model=ExtratoResponse)
+@router.get("/extrato/aluno", response_model=ExtratoResponse, include_in_schema=False)
+def student_statement(db: Session = Depends(get_db),
+                      user: Usuario = Depends(current_user)) -> ExtratoResponse:
+    require_type(user, Aluno)
+    aluno = db.get(Aluno, user.id)
+    envios = list(db.query(EnvioMoeda).filter_by(aluno_id=user.id)
+                  .order_by(EnvioMoeda.data.desc()).all())
+    trocas = list(db.query(TrocaVantagem).filter_by(aluno_id=user.id)
+                  .order_by(TrocaVantagem.data.desc()).all())
+    return ExtratoResponse(saldo=aluno.saldo, envios=envios, trocas=trocas)
+
+
+@router.post("/vantagens", response_model=VantagemResponse, status_code=201)
+def create_advantage(payload: VantagemCreate, db: Session = Depends(get_db),
+                     user: Usuario = Depends(current_user)) -> Vantagem:
+    require_type(user, EmpresaParceira)
+    advantage = Vantagem(**payload.model_dump(), empresa_id=user.id)
+    db.add(advantage)
+    db.commit()
+    db.refresh(advantage)
+    return advantage
+
+
+@router.get("/vantagens", response_model=list[VantagemResponse])
+def list_advantages(db: Session = Depends(get_db),
+                     user: Usuario = Depends(current_user)) -> list[Vantagem]:
+    require_type(user, (Aluno, EmpresaParceira))
+    return list(db.query(Vantagem).order_by(Vantagem.id).all())
+
+
+@router.get("/vantagens/{advantage_id}", response_model=VantagemResponse)
+def get_advantage(advantage_id: int, db: Session = Depends(get_db),
+                  user: Usuario = Depends(current_user)) -> Vantagem:
+    require_type(user, (Aluno, EmpresaParceira))
+    advantage = db.get(Vantagem, advantage_id)
+    if advantage is None:
+        raise HTTPException(status_code=404, detail="Vantagem não encontrada.")
+    return advantage
+
+
+@router.put("/vantagens/{advantage_id}", response_model=VantagemResponse)
+def update_advantage(advantage_id: int, payload: VantagemCreate, db: Session = Depends(get_db),
+                     user: Usuario = Depends(current_user)) -> Vantagem:
+    require_type(user, EmpresaParceira)
+    advantage = db.get(Vantagem, advantage_id)
+    if advantage is None:
+        raise HTTPException(status_code=404, detail="Vantagem não encontrada.")
+    if advantage.empresa_id != user.id:
+        raise HTTPException(status_code=403, detail="Você só pode alterar suas vantagens.")
+    for key, value in payload.model_dump().items():
+        setattr(advantage, key, value)
+    db.commit()
+    db.refresh(advantage)
+    return advantage
+
+
+@router.delete("/vantagens/{advantage_id}", status_code=204)
+def delete_advantage(advantage_id: int, db: Session = Depends(get_db),
+                     user: Usuario = Depends(current_user)) -> None:
+    require_type(user, EmpresaParceira)
+    advantage = db.get(Vantagem, advantage_id)
+    if advantage is None:
+        raise HTTPException(status_code=404, detail="Vantagem não encontrada.")
+    if advantage.empresa_id != user.id:
+        raise HTTPException(status_code=403, detail="Você só pode remover suas vantagens.")
+    if db.query(TrocaVantagem).filter_by(vantagem_id=advantage_id).first():
+        raise HTTPException(status_code=409, detail="Vantagem já possui resgates.")
+    db.delete(advantage)
+    db.commit()
+
+
+@router.post("/vantagens/{advantage_id}/resgatar", response_model=ResgateResponse, status_code=201)
+@router.post("/vantagens/{advantage_id}/trocar", response_model=ResgateResponse,
+             status_code=201, include_in_schema=False)
+def redeem_advantage(advantage_id: int, db: Session = Depends(get_db),
+                     user: Usuario = Depends(current_user)) -> ResgateResponse:
+    require_type(user, Aluno)
+    aluno = db.get(Aluno, user.id)
+    advantage = db.get(Vantagem, advantage_id)
+    if advantage is None:
+        raise HTTPException(status_code=404, detail="Vantagem não encontrada.")
+    if aluno.saldo < advantage.custo_em_moedas:
+        raise HTTPException(status_code=400, detail="Saldo insuficiente.")
+    aluno.saldo -= advantage.custo_em_moedas
+    troca = TrocaVantagem(quantidade=advantage.custo_em_moedas,
+                          codigo=secrets.token_urlsafe(16),
+                          aluno_id=aluno.id, vantagem_id=advantage.id)
+    db.add(troca)
+    db.commit()
+    return ResgateResponse(codigo=troca.codigo, quantidade=troca.quantidade,
+                           vantagem_id=troca.vantagem_id, saldo_restante=aluno.saldo)
+
+
+@router.get("/trocas/{codigo}", response_model=TrocaResponse)
+def check_redemption(codigo: str, db: Session = Depends(get_db),
+                      user: Usuario = Depends(current_user)) -> TrocaVantagem:
+    require_type(user, EmpresaParceira)
+    troca = db.query(TrocaVantagem).join(Vantagem).filter(
+        TrocaVantagem.codigo == codigo, Vantagem.empresa_id == user.id
+    ).first()
+    if troca is None:
+        raise HTTPException(status_code=404, detail="Cupom não encontrado.")
+    return troca

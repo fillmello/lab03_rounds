@@ -1,7 +1,7 @@
 import os
 from collections.abc import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
@@ -26,3 +26,12 @@ def get_db() -> Generator[Session, None, None]:
 
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
+    # Keep local databases created by earlier releases usable without
+    # requiring a destructive reset (Alembic can later own this migration).
+    if "professor" in inspect(engine).get_table_names():
+        columns = {column["name"] for column in inspect(engine).get_columns("professor")}
+        if "ultimo_credito_semestre" not in columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE professor ADD COLUMN ultimo_credito_semestre VARCHAR(7)")
+                )

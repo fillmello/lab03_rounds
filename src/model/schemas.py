@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
@@ -126,3 +127,66 @@ class LoginResponse(BaseModel):
     id: int
     nome: str
     tipo: str
+
+
+class ProfessorResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    nome: str
+    email: str
+    login: str
+    cpf: str
+    departamento: str
+    instituicao_id: int
+    saldo: int
+
+
+class EnvioMoedaCreate(BaseModel):
+    aluno_id: int
+    quantidade: int = Field(gt=0)
+    motivo: NonEmptyString = Field(max_length=1000)
+
+
+class EnvioMoedaResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    data: datetime
+    quantidade: int
+    motivo: str
+    professor_id: int
+    aluno_id: int
+
+
+class ExtratoResponse(BaseModel):
+    saldo: int
+    envios: list[EnvioMoedaResponse] = Field(default_factory=list)
+    trocas: list["TrocaResponse"] = Field(default_factory=list)
+
+
+class VantagemCreate(BaseModel):
+    descricao: NonEmptyString = Field(max_length=2000)
+    foto: NonEmptyString = Field(max_length=255)
+    custo_em_moedas: int = Field(gt=0)
+
+
+class VantagemResponse(VantagemCreate):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    empresa_id: int
+
+
+class TrocaResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    data: datetime
+    quantidade: int
+    codigo: str
+    aluno_id: int
+    vantagem_id: int
+
+
+class ResgateResponse(BaseModel):
+    codigo: str
+    quantidade: int
+    vantagem_id: int
+    saldo_restante: int

@@ -52,6 +52,7 @@ class Professor(Usuario):
     departamento: Mapped[str] = mapped_column(String(120), nullable=False)
     saldo: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     instituicao_id: Mapped[int] = mapped_column(ForeignKey("instituicao_ensino.id"), nullable=False)
+    ultimo_credito_semestre: Mapped[str | None] = mapped_column(String(7), nullable=True)
 
     instituicao: Mapped[InstituicaoEnsino] = relationship(back_populates="professores")
     __mapper_args__ = {"polymorphic_identity": "professor"}
@@ -80,6 +81,7 @@ class Vantagem(Base):
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresa_parceira.id"), nullable=False)
 
     empresa: Mapped[EmpresaParceira] = relationship(back_populates="vantagens")
+    trocas: Mapped[list["TrocaVantagem"]] = relationship(back_populates="vantagem")
 
 
 class EnvioMoeda(Base):
@@ -91,6 +93,8 @@ class EnvioMoeda(Base):
     motivo: Mapped[str] = mapped_column(Text, nullable=False)
     professor_id: Mapped[int] = mapped_column(ForeignKey("professor.id"), nullable=False)
     aluno_id: Mapped[int] = mapped_column(ForeignKey("aluno.id"), nullable=False)
+    professor: Mapped[Professor] = relationship()
+    aluno: Mapped[Aluno] = relationship()
 
 
 class TrocaVantagem(Base):
@@ -102,3 +106,5 @@ class TrocaVantagem(Base):
     codigo: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     aluno_id: Mapped[int] = mapped_column(ForeignKey("aluno.id"), nullable=False)
     vantagem_id: Mapped[int] = mapped_column(ForeignKey("vantagem.id"), nullable=False)
+    aluno: Mapped[Aluno] = relationship()
+    vantagem: Mapped[Vantagem] = relationship(back_populates="trocas")
